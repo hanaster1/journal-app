@@ -1,39 +1,4 @@
-No,Scopus_Match_Key,Scopus_ISSN,Scopus_EISSN,Scopus_Title,Active or Inactive,Coverage,Titles Discontinued by Scopus,Source Type,"Top level:
-
-Life Sciences","Top level:
-
-Social Sciences","Top level:
-
-Physical Sciences","Top level:
-
-Health Sciences","1000 
-General","1100
-Agricultural and Biological Sciences","1200
-Arts and Humanities","1300
-Biochemistry, Genetics and Molecular Biology","1400
-Business, Management and Accounting","1500
-Chemical Engineering","1600
-Chemistry","1700
-Computer Science","1800
-Decision Sciences","1900
-Earth and Planetary Sciences","2000
-Economics, Econometrics and Finance","2100
-Energy","2200
-Engineering","2300
-Environmental Science","2400
-Immunology and Microbiology","2500
-Materials Science","2600
-Mathematics","2700
-Medicine","2800
-Neuroscience","2900
-Nursing","3000
-Pharmacology, Toxicology and Pharmaceutics","3100
-Physics and Astronomy","3200
-Psychology","3300
-Social Sciences","3400
-Veterinary","3500
-Dentistry","3600
-Health Professions"
+id,scopus_match_key,scopus_issn,scopus_eissn,scopus_title,active_status,coverage_years,discontinued,source_type,top_level_life_sciences,top_level_social_sciences,top_level_physical_sciences,top_level_health_sciences,asjc_1000_general,asjc_1100_agricultural_and_biological_sciences,asjc_1200_arts_and_humanities,asjc_1300_biochemistry_genetics_molecular_biology,asjc_1400_business_management_accounting,asjc_1500_chemical_engineering,asjc_1600_chemistry,asjc_1700_computer_science,asjc_1800_decision_sciences,asjc_1900_earth_and_planetary_sciences,asjc_2000_economics_econometrics_finance,asjc_2100_energy,asjc_2200_engineering,asjc_2300_environmental_science,asjc_2400_immunology_and_microbiology,asjc_2500_materials_science,asjc_2600_mathematics,asjc_2700_medicine,asjc_2800_neuroscience,asjc_2900_nursing,asjc_3000_pharmacology_toxicology_pharmaceutics,asjc_3100_physics_and_astronomy,asjc_3200_psychology,asjc_3300_social_sciences,asjc_3400_veterinary,asjc_3500_dentistry,asjc_3600_health_professions
 1,1619-4500,1619-4500,1614-2411,4OR,Active,2003-2026,,Journal,,Social Sciences,Physical Sciences,,,,,,"Business, Management and Accounting ",,,Computer Science ,Decision Sciences ,,,,,,,,Mathematics ,,,,,,,,,,
 2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 3,0001-3072,0001-3072,1467-6281,Abacus,Active,1965-2026,,Journal,,Social Sciences,,,,,,,"Business, Management and Accounting ",,,,,,,,,,,,,,,,,,,,,,
