@@ -1,5 +1,7 @@
 # AGENTS.md
 
+> **Mandatory reading for all LLM agents:** Always read this file first when working on this project. Before making any UX/UI changes or adding a new page, read `DESIGN.md` — it defines the design system, color palette, typography, layout, and responsive behavior that must be followed.
+
 ## Stack
 
 | Layer | Choice |
@@ -37,6 +39,7 @@ Root is a single Next.js app (no monorepo). Expected layout:
 │   └── types/
 ├── database/                  # Source CSVs (read-only reference)
 ├── er-diagram.md
+├── DESIGN.md                  # Design system, colors, typography, layout
 └── AGENTS.md
 ```
 
@@ -134,6 +137,14 @@ Three pages in App Router:
 | `/` | Overview — summary stats, top journals, key metrics |
 | `/area-explorer` | Browse journals by ABDC area / major group / area group |
 | `/journal-search` | Full-text search across journal titles, ISSNs, filtering by source/rating/area |
+
+### Area Explorer specifics
+
+- **Table columns**: Journal Title, Publisher, Rank Quality (combined `ABDC_DB.rating_2025`, `AJG_DB.ajg_2024_rating`, `SCIMAGO_DB.sjr_best_quartile` — show all non-null values per cell, no dedup), ISSN (`issn_print`), ISSN Online (`issn_online`)
+- **Row click**: placeholder — eventually navigates to journal detail page (route TBD)
+- **Instruction text**: "Click on a journal to view details" — placed above the table
+- **Status counters** (placed **below** the table): Journal (total count), Publisher (unique count), Area (unique ABDC areas), Database (4 — ABDC, AJG, Scimago, Scopus)
+- **Layout**: follows DESIGN.md — desktop uses three-column progressive disclosure; mobile uses stacked accordion panels; the table is always visible
 
 All use TanStack Query for client-side data fetching from Next.js API routes or server actions.
 
