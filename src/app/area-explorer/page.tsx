@@ -24,6 +24,32 @@ const RATING_COLORS: Record<string, string> = {
   Q4: "bg-red-100 text-red-800",
 };
 
+const TIER_MAP: Record<string, number> = {
+  "4*": 1,
+  "A*": 2, "4": 2, "Q1": 2,
+  "A": 3, "3": 3, "Q2": 3,
+  "B": 4, "2": 4, "Q3": 4,
+  "C": 5, "1": 5, "Q4": 5,
+};
+
+function getTopRanks(journal: {
+  rating_2025: string | null;
+  ajg: { ajg_2024_rating: string | null } | null;
+  scimago: { sjr_best_quartile: string | null } | null;
+}): string[] {
+  const ranks: { value: string; tier: number }[] = [];
+  const push = (v: string | null) => {
+    const trimmed = v?.trim();
+    if (trimmed && TIER_MAP[trimmed]) ranks.push({ value: trimmed, tier: TIER_MAP[trimmed] });
+  };
+  push(journal.rating_2025);
+  push(journal.ajg?.ajg_2024_rating ?? null);
+  push(journal.scimago?.sjr_best_quartile ?? null);
+  if (ranks.length === 0) return [];
+  const bestTier = Math.min(...ranks.map((r) => r.tier));
+  return ranks.filter((r) => r.tier === bestTier).map((r) => r.value);
+}
+
 function RatingBadge({ label, value }: { label: string; value: string }) {
   const color = RATING_COLORS[value] ?? "bg-muted text-muted-foreground";
   return (
@@ -181,6 +207,9 @@ export default function AreaExplorer() {
                       <th className="sticky top-0 px-4 py-3 text-left font-medium text-foreground">
                         ISSN Online
                       </th>
+                      <th className="sticky top-0 px-4 py-3 text-left font-medium text-foreground">
+                        Top Rank
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -222,11 +251,23 @@ export default function AreaExplorer() {
                         <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                           {journal.issn_online ?? "—"}
                         </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-1">
+                            {getTopRanks(journal).map((rank) => (
+                              <span
+                                key={rank}
+                                className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${RATING_COLORS[rank] ?? "bg-muted text-muted-foreground"}`}
+                              >
+                                {rank}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
                       </tr>
                     ))}
                     {journals.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                        <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                           No journals found for this area.
                         </td>
                       </tr>
