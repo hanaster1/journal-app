@@ -1,0 +1,24 @@
+-- CreateTable
+CREATE TABLE "AREA" (
+    "area_id" SERIAL NOT NULL,
+    "area_name" TEXT NOT NULL,
+
+    CONSTRAINT "AREA_pkey" PRIMARY KEY ("area_id")
+);
+
+-- CreateTable
+CREATE TABLE "JOURNAL_AREA_DETAIL" (
+    "journal_id" INTEGER NOT NULL,
+    "area_id" INTEGER NOT NULL,
+
+    CONSTRAINT "JOURNAL_AREA_DETAIL_pkey" PRIMARY KEY ("journal_id","area_id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AREA_area_name_key" ON "AREA"("area_name");
+
+-- AddForeignKey
+ALTER TABLE "JOURNAL_AREA_DETAIL" ADD CONSTRAINT "JOURNAL_AREA_DETAIL_journal_id_fkey" FOREIGN KEY ("journal_id") REFERENCES "JOURNAL_MAIN"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JOURNAL_AREA_DETAIL" ADD CONSTRAINT "JOURNAL_AREA_DETAIL_area_id_fkey" FOREIGN KEY ("area_id") REFERENCES "AREA"("area_id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,0 +1,24 @@
+-- CreateTable
+CREATE TABLE "MAJOR_GROUP" (
+    "major_group_id" SERIAL NOT NULL,
+    "major_group_name" TEXT NOT NULL,
+
+    CONSTRAINT "MAJOR_GROUP_pkey" PRIMARY KEY ("major_group_id")
+);
+
+-- CreateTable
+CREATE TABLE "JOURNAL_MAJOR_GROUP_DETAIL" (
+    "journal_id" INTEGER NOT NULL,
+    "major_group_id" INTEGER NOT NULL,
+
+    CONSTRAINT "JOURNAL_MAJOR_GROUP_DETAIL_pkey" PRIMARY KEY ("journal_id","major_group_id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MAJOR_GROUP_major_group_name_key" ON "MAJOR_GROUP"("major_group_name");
+
+-- AddForeignKey
+ALTER TABLE "JOURNAL_MAJOR_GROUP_DETAIL" ADD CONSTRAINT "JOURNAL_MAJOR_GROUP_DETAIL_journal_id_fkey" FOREIGN KEY ("journal_id") REFERENCES "JOURNAL_MAIN"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JOURNAL_MAJOR_GROUP_DETAIL" ADD CONSTRAINT "JOURNAL_MAJOR_GROUP_DETAIL_major_group_id_fkey" FOREIGN KEY ("major_group_id") REFERENCES "MAJOR_GROUP"("major_group_id") ON DELETE RESTRICT ON UPDATE CASCADE;

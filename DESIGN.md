@@ -62,6 +62,20 @@ Polite, calm, academic purple tone. Not loud or playful.
 - **Desktop:** three-column progressive disclosure — areas list | groups | journals.
 - **Mobile:** stacked accordion panels (expand area → shows groups → expand group → shows journals).
 
+## Rating Badge Colors
+
+Badges use a muted academic palette. Each tier has a distinct color that progressively desaturates from highest to lowest prestige.
+
+| Tier | Ratings | Background | Text | Border |
+|------|---------|------------|------|--------|
+| 1 | 4* | `bg-primary/10` | `text-primary` | `border-primary/20` |
+| 2 | A*, 4, Q1 | `bg-indigo-50` | `text-indigo-700` | `border-indigo-200` |
+| 3 | A, 3, Q2 | `bg-slate-50` | `text-slate-600` | `border-slate-200` |
+| 4 | B, 2, Q3 | `bg-stone-50` | `text-stone-500` | `border-stone-200` |
+| 5 | C, 1, Q4 | `bg-zinc-50` | `text-zinc-400` | `border-zinc-200` |
+
+Badge style: subtle border, muted fill, professional academic tone. No loud or saturated colors.
+
 ## Empty & Loading States
 
 - **Loading:** skeleton placeholders matching final layout shape (card skeletons, row skeletons), subtle pulse animation.

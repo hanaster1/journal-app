@@ -40,6 +40,10 @@
 | 2 | Scimago_Match_Key | `scimago_match_key` | `VARCHAR(20)` | Scimago matching key (usually ISSN) |
 | 3 | Scimago_ISSN | `scimago_issn` | `VARCHAR(20)` | Print ISSN from Scimago |
 | 4 | Scimago_EISSN | `scimago_eissn` | `VARCHAR(20)` | Online ISSN from Scimago |
+| 5 | Scimago_Title | `scimago_title` | `VARCHAR(500)` | Journal title from Scimago |
+| 6 | SJR_Best_Quartile | `sjr_best_quartile` | `VARCHAR(5)` | Best SJR quartile (Q1, Q2, Q3, Q4) |
+| 7 | Scimago_Categories | `scimago_categories` | `VARCHAR(500)` | Scimago subject categories |
+| 8 | Scimago_Areas | `scimago_areas` | `VARCHAR(500)` | Scimago subject areas |
 
 ## Scopus Database
 
@@ -90,17 +94,18 @@
 
 | # | Original Column | New Column (snake_case) | Type | Description |
 |---|----------------|------------------------|------|-------------|
-| 1 | Journal Title | `journal_title` | `VARCHAR(500)` | Full title of the journal |
-| 2 | ISSN | `issn_print` | `VARCHAR(20)` | Print ISSN |
-| 3 | ISSNOnline | `issn_online` | `VARCHAR(20)` | Online ISSN |
-| 4 | Source | `source` | `VARCHAR(10)` | Source database: `ABDC`, `AJG`, `Scimago`, or `Scopus` |
-| 5 | Area | `area` | `VARCHAR(200)` | Subject area classification from the source database |
-| 6 | Rank | `rank` | `VARCHAR(5)` | Quality rating from source — ABDC: A\*, A, B, C; Scimago: Q1–Q4 |
-| 7 | Active or Inactive | `active_status` | `VARCHAR(10)` | `Active` or `Inactive` (only populated for Scopus rows) |
-| 8 | Source Type | `source_type` | `VARCHAR(30)` | Publication type (only populated for Scopus rows) |
-| 9 | Best Rank | `best_rank` | `VARCHAR(5)` | Best rank across all areas for the journal within the same source |
-| 10 | Area Group | `area_group` | `VARCHAR(100)` | Grouped subject area (e.g. Business, Computer Science, Medicine) |
-| 11 | Major Group | `major_group` | `VARCHAR(100)` | Higher-level grouping: Arts & Humanities, Business & Economics, Engineering & Technology, Environmental & Interdisciplinary, Health & Life Sciences, Social Sciences |
+| 1 | — | `id` | `SERIAL PRIMARY KEY` | Auto-incrementing unique identifier |
+| 2 | Journal Title | `journal_title` | `VARCHAR(500)` | Full title of the journal |
+| 3 | ISSN | `issn_print` | `VARCHAR(20)` | Print ISSN |
+| 4 | ISSNOnline | `issn_online` | `VARCHAR(20)` | Online ISSN |
+| 5 | Source | `source` | `VARCHAR(10)` | Source database: `ABDC`, `AJG`, `Scimago`, or `Scopus` |
+| 6 | Area | `area` | `VARCHAR(200)` | Subject area classification from the source database |
+| 7 | Rank | `rank` | `VARCHAR(5)` | Quality rating from source — ABDC: A\*, A, B, C; Scimago: Q1–Q4 |
+| 8 | Active or Inactive | `active_status` | `VARCHAR(10)` | `Active` or `Inactive` (only populated for Scopus rows) |
+| 9 | Source Type | `source_type` | `VARCHAR(30)` | Publication type (only populated for Scopus rows) |
+| 10 | Best Rank | `best_rank` | `VARCHAR(5)` | Best rank across all areas for the journal within the same source |
+| 11 | Area Group | `area_group` | `VARCHAR(100)` | Grouped subject area (e.g. Business, Computer Science, Medicine) |
+| 12 | Major Group | `major_group` | `VARCHAR(100)` | Higher-level grouping: Arts & Humanities, Business & Economics, Engineering & Technology, Environmental & Interdisciplinary, Health & Life Sciences, Social Sciences |
 
 ## NOTE Database
 
@@ -112,3 +117,48 @@
 | 4 | หมายเหตุรอง2 | `note_secondary_2` | `TEXT` | Secondary detail, typically ISSN / EISSN values from source databases |
 | 5 | หมายเหตุรอง3 | `note_secondary_3` | `TEXT` | Secondary detail with additional context (mostly null) |
 | 6 | หมายเหตุที่ทำให้ปรับ | `adjustment_reason` | `TEXT` | Reason or trigger for the adjustment (e.g. ISSN mismatch between databases) |
+
+## AREA (Normalized Area Lookup)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `area_id` | `SERIAL PRIMARY KEY` | Auto-incrementing unique identifier for each area |
+| 2 | `area_name` | `VARCHAR(200) UNIQUE` | Subject area name (e.g. "Computer Science", "Medicine", "Business, Management and Accounting") |
+
+## JOURNAL_AREA_DETAIL (Journal-Area Many-to-Many)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `journal_id` | `INTEGER`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
+| 2 | `area_id` | `INTEGER`, FK → `AREA.area_id` | References the area in `AREA` |
+| — | Composite PK | `(journal_id, area_id)` | A journal can have multiple areas; each (journal, area) pair is unique |
+
+## AREA_GROUP (Normalized Area Group Lookup)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `area_group_id` | `SERIAL PRIMARY KEY` | Auto-incrementing unique identifier for each area group |
+| 2 | `area_group_name` | `VARCHAR(100) UNIQUE` | Area group name (e.g. "Business", "Computer Science", "Medicine", "Engineering") |
+
+## JOURNAL_AREA_GROUP_DETAIL (Journal-AreaGroup Many-to-Many)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `journal_id` | `INTEGER`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
+| 2 | `area_group_id` | `INTEGER`, FK → `AREA_GROUP.area_group_id` | References the area group in `AREA_GROUP` |
+| — | Composite PK | `(journal_id, area_group_id)` | A journal can belong to multiple area groups; each (journal, area_group) pair is unique |
+
+## MAJOR_GROUP (Normalized Major Group Lookup)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `major_group_id` | `SERIAL PRIMARY KEY` | Auto-incrementing unique identifier for each major group |
+| 2 | `major_group_name` | `VARCHAR(100) UNIQUE` | Major group name (e.g. "Arts & Humanities", "Business & Economics", "Engineering & Technology") |
+
+## JOURNAL_MAJOR_GROUP_DETAIL (Journal-MajorGroup Many-to-Many)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `journal_id` | `INTEGER`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
+| 2 | `major_group_id` | `INTEGER`, FK → `MAJOR_GROUP.major_group_id` | References the major group in `MAJOR_GROUP` |
+| — | Composite PK | `(journal_id, major_group_id)` | A journal can belong to multiple major groups; each (journal, major_group) pair is unique |

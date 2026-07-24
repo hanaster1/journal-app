@@ -17,6 +17,10 @@ model JOURNAL_MAIN {
   scimago SCIMAGO_DB?
   scopus  SCOPUS_DB?
   note    NOTE_DB?
+
+  journalAreaDetails       JOURNAL_AREA_DETAIL[]
+  journalAreaGroupDetails  JOURNAL_AREA_GROUP_DETAIL[]
+  journalMajorGroupDetails JOURNAL_MAJOR_GROUP_DETAIL[]
 }
 
 model ABDC_DB {
@@ -125,4 +129,55 @@ model journal_area {
   best_rank      String?
   area_group     String?
   major_group    String
+}
+
+model AREA {
+  area_id   Int     @id @default(autoincrement())
+  area_name String  @unique
+
+  journalAreaDetails JOURNAL_AREA_DETAIL[]
+}
+
+model JOURNAL_AREA_DETAIL {
+  journal_id Int
+  area_id    Int
+
+  journal JOURNAL_MAIN @relation(fields: [journal_id], references: [id])
+  area    AREA         @relation(fields: [area_id], references: [area_id])
+
+  @@id([journal_id, area_id])
+}
+
+model AREA_GROUP {
+  area_group_id   Int     @id @default(autoincrement())
+  area_group_name String  @unique
+
+  journalAreaGroupDetails JOURNAL_AREA_GROUP_DETAIL[]
+}
+
+model JOURNAL_AREA_GROUP_DETAIL {
+  journal_id      Int
+  area_group_id   Int
+
+  journal     JOURNAL_MAIN @relation(fields: [journal_id], references: [id])
+  areaGroup   AREA_GROUP   @relation(fields: [area_group_id], references: [area_group_id])
+
+  @@id([journal_id, area_group_id])
+}
+
+model MAJOR_GROUP {
+  major_group_id   Int     @id @default(autoincrement())
+  major_group_name String  @unique
+
+  journalMajorGroupDetails JOURNAL_MAJOR_GROUP_DETAIL[]
+}
+
+model JOURNAL_MAJOR_GROUP_DETAIL {
+  journal_id      Int
+  major_group_id  Int
+
+  journal     JOURNAL_MAIN @relation(fields: [journal_id], references: [id])
+  majorGroup  MAJOR_GROUP  @relation(fields: [major_group_id], references: [major_group_id])
+
+  @@id([journal_id, major_group_id])
 }

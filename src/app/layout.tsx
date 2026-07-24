@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground">
         <Providers>
           <Nav />
-          <main className="md:pl-64 lg:pl-72 pb-20 md:pb-0">
+          <main className="pb-6">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
               {children}
             </div>

@@ -7,6 +7,12 @@ erDiagram
     JOURNAL_MAIN ||--o| SCIMAGO_DB : "id"
     JOURNAL_MAIN ||--o| SCOPUS_DB : "id"
     JOURNAL_MAIN ||--o| NOTE_DB : "id"
+    JOURNAL_MAIN ||--o{ JOURNAL_AREA_DETAIL : "journal_id"
+    JOURNAL_MAIN ||--o{ JOURNAL_AREA_GROUP_DETAIL : "journal_id"
+    JOURNAL_MAIN ||--o{ JOURNAL_MAJOR_GROUP_DETAIL : "journal_id"
+    JOURNAL_AREA_DETAIL }o--|| AREA : "area_id"
+    JOURNAL_AREA_GROUP_DETAIL }o--|| AREA_GROUP : "area_group_id"
+    JOURNAL_MAJOR_GROUP_DETAIL }o--|| MAJOR_GROUP : "major_group_id"
 
     JOURNAL_MAIN {
         int id "PK"
@@ -78,6 +84,7 @@ erDiagram
     }
 
     journal_area {
+        int id "PK (auto-increment)"
         varchar journal_title "Journal Title"
         varchar issn_print "Print ISSN"
         varchar issn_online "Online ISSN"
@@ -90,6 +97,36 @@ erDiagram
         varchar area_group "Area Group"
         varchar major_group "Major Group"
     }
+
+    AREA {
+        int area_id "PK (auto-increment)"
+        varchar area_name "Area Name (unique)"
+    }
+
+    JOURNAL_AREA_DETAIL {
+        int journal_id "PK FK"
+        int area_id "PK FK"
+    }
+
+    AREA_GROUP {
+        int area_group_id "PK (auto-increment)"
+        varchar area_group_name "Area Group Name (unique)"
+    }
+
+    JOURNAL_AREA_GROUP_DETAIL {
+        int journal_id "PK FK"
+        int area_group_id "PK FK"
+    }
+
+    MAJOR_GROUP {
+        int major_group_id "PK (auto-increment)"
+        varchar major_group_name "Major Group Name (unique)"
+    }
+
+    JOURNAL_MAJOR_GROUP_DETAIL {
+        int journal_id "PK FK"
+        int major_group_id "PK FK"
+    }
 ```
 
 ## Relationships
@@ -101,5 +138,10 @@ erDiagram
 | `JOURNAL_MAIN` | `SCIMAGO_DB` | One-to-Zero-or-One | Each journal may have a Scimago record (matched by `id`) |
 | `JOURNAL_MAIN` | `SCOPUS_DB` | One-to-Zero-or-One | Each journal may have a Scopus record (matched by `id`) |
 | `JOURNAL_MAIN` | `NOTE_DB` | One-to-Zero-or-One | Each journal may have adjustment notes (matched by `id`) |
+| `JOURNAL_MAIN` | `JOURNAL_AREA_DETAIL` | One-to-Many | Each journal may have multiple area associations |
+| `JOURNAL_MAIN` | `JOURNAL_AREA_GROUP_DETAIL` | One-to-Many | Each journal may have multiple area group associations |
+| `JOURNAL_MAIN` | `JOURNAL_MAJOR_GROUP_DETAIL` | One-to-Many | Each journal may have multiple major group associations |
+| `AREA` | `JOURNAL_AREA_DETAIL` | One-to-Many | Each area may be associated with multiple journals |
+| `AREA_GROUP` | `JOURNAL_AREA_GROUP_DETAIL` | One-to-Many | Each area group may be associated with multiple journals |
+| `MAJOR_GROUP` | `JOURNAL_MAJOR_GROUP_DETAIL` | One-to-Many | Each major group may be associated with multiple journals |
 | — | `journal_area` | Standalone | A denormalized/aggregated view combining data from all source databases |
-```
