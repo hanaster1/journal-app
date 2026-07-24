@@ -3,8 +3,8 @@ import { prisma } from "@/lib/db";
 
 export async function GET() {
   const [journalCount, publisherCount, areaCount] = await Promise.all([
-    prisma.aBDC_DB.count(),
-    prisma.aBDC_DB.findMany({
+    prisma.jOURNAL_MAIN.count(),
+    prisma.jOURNAL_MAIN.findMany({
       where: { publisher: { not: null } },
       select: { publisher: true },
       distinct: ["publisher"],

@@ -2,15 +2,20 @@
 
 ```mermaid
 erDiagram
-    ABDC_DB ||--o| AJG_DB : "id"
-    ABDC_DB ||--o| SCIMAGO_DB : "id"
-    ABDC_DB ||--o| SCOPUS_DB : "id"
-    ABDC_DB ||--o| NOTE_DB : "id"
+    JOURNAL_MAIN ||--o| ABDC_DB : "id"
+    JOURNAL_MAIN ||--o| AJG_DB : "id"
+    JOURNAL_MAIN ||--o| SCIMAGO_DB : "id"
+    JOURNAL_MAIN ||--o| SCOPUS_DB : "id"
+    JOURNAL_MAIN ||--o| NOTE_DB : "id"
 
-    ABDC_DB {
-        int id "PK SERIAL PRIMARY KEY"
+    JOURNAL_MAIN {
+        int id "PK"
         varchar journal_title "Journal Title"
         varchar publisher "Publisher"
+    }
+
+    ABDC_DB {
+        int id "PK FK"
         varchar issn_print "Print ISSN"
         varchar issn_online "Online ISSN"
         int year_inception "Year Inception"
@@ -21,7 +26,7 @@ erDiagram
     }
 
     AJG_DB {
-        int id "PK FK SERIAL PRIMARY KEY"
+        int id "PK FK"
         varchar ajg_match_key "AJG Match Key"
         varchar ajg_issn "AJG ISSN"
         varchar ajg_title "AJG Title"
@@ -30,7 +35,7 @@ erDiagram
     }
 
     SCIMAGO_DB {
-        int id "PK FK SERIAL PRIMARY KEY"
+        int id "PK FK"
         varchar scimago_issn "Scimago ISSN"
         varchar scimago_eissn "Scimago EISSN"
         varchar scimago_title "Scimago Title"
@@ -41,7 +46,7 @@ erDiagram
     }
 
     SCOPUS_DB {
-        int id "PK FK SERIAL PRIMARY KEY"
+        int id "PK FK"
         varchar scopus_match_key "Scopus Match Key"
         varchar scopus_issn "Scopus ISSN"
         varchar scopus_eissn "Scopus EISSN"
@@ -64,7 +69,7 @@ erDiagram
     }
 
     NOTE_DB {
-        int id "PK FK SERIAL PRIMARY KEY"
+        int id "PK FK"
         text note_primary "Primary Note"
         text note_secondary_1 "Secondary Detail 1"
         text note_secondary_2 "Secondary Detail 2"
@@ -91,9 +96,10 @@ erDiagram
 
 | Parent | Child | Type | Description |
 |--------|-------|------|-------------|
-| `ABDC_DB` | `AJG_DB` | One-to-Zero-or-One | Each ABDC journal may have an AJG record (matched by `id`) |
-| `ABDC_DB` | `SCIMAGO_DB` | One-to-Zero-or-One | Each ABDC journal may have a Scimago record (matched by `id`) |
-| `ABDC_DB` | `SCOPUS_DB` | One-to-Zero-or-One | Each ABDC journal may have a Scopus record (matched by `id`) |
-| `ABDC_DB` | `NOTE_DB` | One-to-Zero-or-One | Each ABDC journal may have adjustment notes (matched by `id`) |
+| `JOURNAL_MAIN` | `ABDC_DB` | One-to-Zero-or-One | Each journal may have ABDC rating data (matched by `id`) |
+| `JOURNAL_MAIN` | `AJG_DB` | One-to-Zero-or-One | Each journal may have an AJG record (matched by `id`) |
+| `JOURNAL_MAIN` | `SCIMAGO_DB` | One-to-Zero-or-One | Each journal may have a Scimago record (matched by `id`) |
+| `JOURNAL_MAIN` | `SCOPUS_DB` | One-to-Zero-or-One | Each journal may have a Scopus record (matched by `id`) |
+| `JOURNAL_MAIN` | `NOTE_DB` | One-to-Zero-or-One | Each journal may have adjustment notes (matched by `id`) |
 | — | `journal_area` | Standalone | A denormalized/aggregated view combining data from all source databases |
 ```

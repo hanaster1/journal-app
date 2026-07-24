@@ -4,13 +4,23 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+}
+
+model JOURNAL_MAIN {
+  id            Int     @id
+  journal_title String
+  publisher     String?
+
+  abdc    ABDC_DB?
+  ajg     AJG_DB?
+  scimago SCIMAGO_DB?
+  scopus  SCOPUS_DB?
+  note    NOTE_DB?
 }
 
 model ABDC_DB {
-  id             Int       @id
-  journal_title  String
-  publisher      String?
+  id             Int    @id
   issn_print     String?
   issn_online    String?
   year_inception Int?
@@ -19,10 +29,7 @@ model ABDC_DB {
   rating_2025    String?
   notes          String?
 
-  ajg    AJG_DB?
-  scimago SCIMAGO_DB?
-  scopus SCOPUS_DB?
-  note   NOTE_DB?
+  journal JOURNAL_MAIN @relation(fields: [id], references: [id])
 }
 
 model AJG_DB {
@@ -33,7 +40,7 @@ model AJG_DB {
   ajg_subject_area String?
   ajg_2024_rating  String?
 
-  abdc ABDC_DB @relation(fields: [id], references: [id])
+  journal JOURNAL_MAIN @relation(fields: [id], references: [id])
 }
 
 model SCIMAGO_DB {
@@ -46,7 +53,7 @@ model SCIMAGO_DB {
   scimago_match_key   String?
   scimago_areas       String?
 
-  abdc ABDC_DB @relation(fields: [id], references: [id])
+  journal JOURNAL_MAIN @relation(fields: [id], references: [id])
 }
 
 model SCOPUS_DB {
@@ -91,7 +98,7 @@ model SCOPUS_DB {
   asjc_3500_dentistry          String?
   asjc_3600_health_professions String?
 
-  abdc ABDC_DB @relation(fields: [id], references: [id])
+  journal JOURNAL_MAIN @relation(fields: [id], references: [id])
 }
 
 model NOTE_DB {
@@ -102,7 +109,7 @@ model NOTE_DB {
   note_secondary_3  String?
   adjustment_reason String?
 
-  abdc ABDC_DB @relation(fields: [id], references: [id])
+  journal JOURNAL_MAIN @relation(fields: [id], references: [id])
 }
 
 model journal_area {

@@ -1,23 +1,31 @@
-# ABDC Database — Data Dictionary
+# Journal Database — Data Dictionary
+
+## JOURNAL_MAIN (Hub Table)
 
 | # | Original Column | New Column (snake_case) | Type | Description |
 |---|----------------|------------------------|------|-------------|
-| 1 | No | `id` | `SERIAL PRIMARY KEY` | Auto-incrementing row identifier |
+| 1 | No | `id` | `PRIMARY KEY` | Unique journal identifier (shared as FK by all satellite tables) |
 | 2 | Journal Title | `journal_title` | `VARCHAR(500)` | Full title of the journal |
 | 3 | Publisher | `publisher` | `VARCHAR(300)` | Publisher / organization that publishes the journal |
-| 4 | ISSN | `issn_print` | `VARCHAR(20)` | Print ISSN (International Standard Serial Number) |
-| 5 | ISSNOnline | `issn_online` | `VARCHAR(20)` | Online ISSN (may be empty for print-only journals) |
-| 6 | Year Inception | `year_inception` | `INTEGER` | Year the journal was first published |
-| 7 | FoR | `for_code` | `INTEGER` | Australian Field of Research (FoR) code (e.g. 3501) |
-| 8 | ABDC Area | `abdc_area` | `VARCHAR(200)` | ABDC subject area classification |
-| 9 | 2025 rating | `rating_2025` | `VARCHAR(5)` | ABDC journal quality rating: A*, A, B, or C |
-| 10 | หมายเหตุ | `notes` | `TEXT` | Additional notes / remarks (e.g. ISSN mismatches) |
+
+## ABDC Database
+
+| # | Original Column | New Column (snake_case) | Type | Description |
+|---|----------------|------------------------|------|-------------|
+| 1 | No | `id` | `PRIMARY KEY`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
+| 2 | ISSN | `issn_print` | `VARCHAR(20)` | Print ISSN (International Standard Serial Number) |
+| 3 | ISSNOnline | `issn_online` | `VARCHAR(20)` | Online ISSN (may be empty for print-only journals) |
+| 4 | Year Inception | `year_inception` | `INTEGER` | Year the journal was first published |
+| 5 | FoR | `for_code` | `INTEGER` | Australian Field of Research (FoR) code (e.g. 3501) |
+| 6 | ABDC Area | `abdc_area` | `VARCHAR(200)` | ABDC subject area classification |
+| 7 | 2025 rating | `rating_2025` | `VARCHAR(5)` | ABDC journal quality rating: A*, A, B, or C |
+| 8 | หมายเหตุ | `notes` | `TEXT` | Additional notes / remarks (e.g. ISSN mismatches) |
 
 ## AJG Database
 
 | # | Original Column | New Column (snake_case) | Type | Description |
 |---|----------------|------------------------|------|-------------|
-| 1 | No | `id` | `SERIAL PRIMARY KEY` | Auto-incrementing row identifier |
+| 1 | No | `id` | `PRIMARY KEY`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
 | 2 | ASG_Match_Key | `ajg_match_key` | `VARCHAR(20)` | AJG matching key (usually ISSN) — original column had `ASG` typo |
 | 3 | ASG_ISSN | `ajg_issn` | `VARCHAR(20)` | ISSN used for AJG matching — original column had `ASG` typo |
 | 4 | ASG_Title | `ajg_title` | `VARCHAR(500)` | Journal title from AJG — original column had `ASG` typo |
@@ -28,7 +36,7 @@
 
 | # | Original Column | New Column (snake_case) | Type | Description |
 |---|----------------|------------------------|------|-------------|
-| 1 | No | `id` | `SERIAL PRIMARY KEY` | Auto-incrementing row identifier |
+| 1 | No | `id` | `PRIMARY KEY`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
 | 2 | Scimago_Match_Key | `scimago_match_key` | `VARCHAR(20)` | Scimago matching key (usually ISSN) |
 | 3 | Scimago_ISSN | `scimago_issn` | `VARCHAR(20)` | Print ISSN from Scimago |
 | 4 | Scimago_EISSN | `scimago_eissn` | `VARCHAR(20)` | Online ISSN from Scimago |
@@ -37,7 +45,7 @@
 
 | # | Original Column | New Column (snake_case) | Type | Description |
 |---|----------------|------------------------|------|-------------|
-| 1 | No | `id` | `SERIAL PRIMARY KEY` | Auto-incrementing row identifier |
+| 1 | No | `id` | `PRIMARY KEY`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
 | 2 | Scopus_Match_Key | `scopus_match_key` | `VARCHAR(20)` | Scopus matching key (usually ISSN; occasional data-quality issues where title appears here) |
 | 3 | Scopus_ISSN | `scopus_issn` | `VARCHAR(20)` | Print ISSN from Scopus |
 | 4 | Scopus_EISSN | `scopus_eissn` | `VARCHAR(20)` | Online ISSN from Scopus |
@@ -98,7 +106,7 @@
 
 | # | Original Column | New Column (snake_case) | Type | Description |
 |---|----------------|------------------------|------|-------------|
-| 1 | No | `id` | `SERIAL PRIMARY KEY` | Auto-incrementing row identifier |
+| 1 | No | `id` | `PRIMARY KEY`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
 | 2 | หมายเหตุหลัก | `note_primary` | `TEXT` | Primary note describing the issue or adjustment made when cross-referencing journals |
 | 3 | หมายเหตุรอง1 | `note_secondary_1` | `TEXT` | Secondary detail, typically ISSN-L / ISSN-H cluster references |
 | 4 | หมายเหตุรอง2 | `note_secondary_2` | `TEXT` | Secondary detail, typically ISSN / EISSN values from source databases |

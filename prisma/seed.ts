@@ -1,11 +1,12 @@
+import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { readFileSync } from "fs";
 import { parse } from "csv-parse/sync";
 import path from "path";
 
-const adapter = new PrismaLibSql({
-  url: "file:./prisma/dev.db",
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
 });
 const prisma = new PrismaClient({ adapter });
 
@@ -31,14 +32,31 @@ function toInt(val: string | undefined): number | null {
   return isNaN(n) ? null : n;
 }
 
+async function seedJournalMain() {
+  const rows = readCsv("ABDC_DB.csv");
+  for (const row of rows) {
+    await prisma.jOURNAL_MAIN.upsert({
+      where: { id: parseInt(row.id, 10) },
+      update: {
+        journal_title: row.journal_title.trim(),
+        publisher: emptyToNull(row.publisher),
+      },
+      create: {
+        id: parseInt(row.id, 10),
+        journal_title: row.journal_title.trim(),
+        publisher: emptyToNull(row.publisher),
+      },
+    });
+  }
+  console.log(`Seeded ${rows.length} JOURNAL_MAIN rows`);
+}
+
 async function seedAbdc() {
   const rows = readCsv("ABDC_DB.csv");
   for (const row of rows) {
     await prisma.aBDC_DB.upsert({
       where: { id: parseInt(row.id, 10) },
       update: {
-        journal_title: row.journal_title.trim(),
-        publisher: emptyToNull(row.publisher),
         issn_print: emptyToNull(row.issn_print),
         issn_online: emptyToNull(row.issn_online),
         year_inception: toInt(row.year_inception),
@@ -49,8 +67,6 @@ async function seedAbdc() {
       },
       create: {
         id: parseInt(row.id, 10),
-        journal_title: row.journal_title.trim(),
-        publisher: emptyToNull(row.publisher),
         issn_print: emptyToNull(row.issn_print),
         issn_online: emptyToNull(row.issn_online),
         year_inception: toInt(row.year_inception),
@@ -233,6 +249,7 @@ async function seedJournalArea() {
 
 async function main() {
   console.log("Seeding database...");
+  await seedJournalMain();
   await seedAbdc();
   await seedAjg();
   await seedScimago();
