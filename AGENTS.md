@@ -45,12 +45,15 @@ Root is a single Next.js app (no monorepo). Expected layout:
 
 ## Database schema (Prisma models)
 
-Five tables, all sharing `id` as FK:
+Hub table `JOURNAL_MAIN` with satellite tables and normalized many-to-many relations:
 
-### `ABDC_DB` (master table)
+### `JOURNAL_MAIN` (hub table)
 - `id` Int PK
 - `journal_title` String
 - `publisher` String?
+
+### `ABDC_DB`
+- `id` Int PK (FK → JOURNAL_MAIN.id)
 - `issn_print` String?
 - `issn_online` String?
 - `year_inception` Int?
@@ -60,7 +63,7 @@ Five tables, all sharing `id` as FK:
 - `notes` String?
 
 ### `AJG_DB`
-- `id` Int PK (FK → ABDC_DB.id)
+- `id` Int PK (FK → JOURNAL_MAIN.id)
 - `ajg_match_key` String?
 - `ajg_issn` String?
 - `ajg_title` String?
@@ -68,7 +71,7 @@ Five tables, all sharing `id` as FK:
 - `ajg_2024_rating` String?
 
 ### `SCIMAGO_DB`
-- `id` Int PK (FK → ABDC_DB.id)
+- `id` Int PK (FK → JOURNAL_MAIN.id)
 - `scimago_issn` String?
 - `scimago_eissn` String?
 - `scimago_title` String?
@@ -78,7 +81,7 @@ Five tables, all sharing `id` as FK:
 - `scimago_areas` String?
 
 ### `SCOPUS_DB`
-- `id` Int PK (FK → ABDC_DB.id)
+- `id` Int PK (FK → JOURNAL_MAIN.id)
 - `scopus_match_key` String?
 - `scopus_issn` String?
 - `scopus_eissn` String?
@@ -94,14 +97,15 @@ Five tables, all sharing `id` as FK:
 - plus 26 ASJC columns (`asjc_1000_general`…`asjc_3600_health_professions`) all String?
 
 ### `NOTE_DB`
-- `id` Int PK (FK → ABDC_DB.id)
+- `id` Int PK (FK → JOURNAL_MAIN.id)
 - `note_primary` String?
 - `note_secondary_1` String?
 - `note_secondary_2` String?
 - `note_secondary_3` String?
 - `adjustment_reason` String?
 
-### `journal_area` (standalone view/table)
+### `journal_area` (standalone denormalized table)
+- `id` Int PK (auto-increment)
 - `journal_title` String
 - `issn_print` String?
 - `issn_online` String?
@@ -114,7 +118,34 @@ Five tables, all sharing `id` as FK:
 - `area_group` String?
 - `major_group` String
 
-ABDC_DB is the hub; AJG/SCIMAGO/SCOPUS/NOTE each have a 1:0..1 relation keyed on `id`.
+### `AREA` (normalized area lookup)
+- `area_id` Int PK (auto-increment)
+- `area_name` String @unique
+
+### `JOURNAL_AREA_DETAIL` (journal ↔ area many-to-many)
+- `journal_id` Int (FK → JOURNAL_MAIN.id)
+- `area_id` Int (FK → AREA.area_id)
+- Composite PK (`journal_id`, `area_id`)
+
+### `AREA_GROUP` (normalized area group lookup)
+- `area_group_id` Int PK (auto-increment)
+- `area_group_name` String @unique
+
+### `JOURNAL_AREA_GROUP_DETAIL` (journal ↔ area_group many-to-many)
+- `journal_id` Int (FK → JOURNAL_MAIN.id)
+- `area_group_id` Int (FK → AREA_GROUP.area_group_id)
+- Composite PK (`journal_id`, `area_group_id`)
+
+### `MAJOR_GROUP` (normalized major group lookup)
+- `major_group_id` Int PK (auto-increment)
+- `major_group_name` String @unique
+
+### `JOURNAL_MAJOR_GROUP_DETAIL` (journal ↔ major_group many-to-many)
+- `journal_id` Int (FK → JOURNAL_MAIN.id)
+- `major_group_id` Int (FK → MAJOR_GROUP.major_group_id)
+- Composite PK (`journal_id`, `major_group_id`)
+
+JOURNAL_MAIN is the hub; ABDC/AJG/SCIMAGO/SCOPUS/NOTE each have a 1:0..1 relation keyed on `id`. AREA, AREA_GROUP, and MAJOR_GROUP are linked to journals through their respective detail (join) tables.
 
 ## Seed data
 
