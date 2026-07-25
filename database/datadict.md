@@ -58,37 +58,8 @@
 | 7 | Coverage | `coverage_years` | `VARCHAR(100)` | Year ranges of Scopus coverage (e.g. `2003-2026`) |
 | 8 | Titles Discontinued by Scopus | `discontinued` | `VARCHAR(50)` | Non-null if the journal was discontinued by Scopus |
 | 9 | Source Type | `source_type` | `VARCHAR(30)` | Publication type: `Journal`, `Book Series`, `Trade Journal`, etc. |
-| 10 | Top level: Life Sciences | `top_level_life_sciences` | `VARCHAR(50)` | Non-null if journal belongs to this top-level ASJC division |
-| 11 | Top level: Social Sciences | `top_level_social_sciences` | `VARCHAR(50)` | Non-null if journal belongs to this top-level ASJC division |
-| 12 | Top level: Physical Sciences | `top_level_physical_sciences` | `VARCHAR(50)` | Non-null if journal belongs to this top-level ASJC division |
-| 13 | Top level: Health Sciences | `top_level_health_sciences` | `VARCHAR(50)` | Non-null if journal belongs to this top-level ASJC division |
-| 14 | 1000 General | `asjc_1000_general` | `VARCHAR(100)` | ASJC subject area classification |
-| 15 | 1100 Agricultural and Biological Sciences | `asjc_1100_agricultural_and_biological_sciences` | `VARCHAR(100)` | ASJC subject area classification |
-| 16 | 1200 Arts and Humanities | `asjc_1200_arts_and_humanities` | `VARCHAR(100)` | ASJC subject area classification |
-| 17 | 1300 Biochemistry, Genetics and Molecular Biology | `asjc_1300_biochemistry_genetics_molecular_biology` | `VARCHAR(100)` | ASJC subject area classification |
-| 18 | 1400 Business, Management and Accounting | `asjc_1400_business_management_accounting` | `VARCHAR(100)` | ASJC subject area classification |
-| 19 | 1500 Chemical Engineering | `asjc_1500_chemical_engineering` | `VARCHAR(100)` | ASJC subject area classification |
-| 20 | 1600 Chemistry | `asjc_1600_chemistry` | `VARCHAR(100)` | ASJC subject area classification |
-| 21 | 1700 Computer Science | `asjc_1700_computer_science` | `VARCHAR(100)` | ASJC subject area classification |
-| 22 | 1800 Decision Sciences | `asjc_1800_decision_sciences` | `VARCHAR(100)` | ASJC subject area classification |
-| 23 | 1900 Earth and Planetary Sciences | `asjc_1900_earth_and_planetary_sciences` | `VARCHAR(100)` | ASJC subject area classification |
-| 24 | 2000 Economics, Econometrics and Finance | `asjc_2000_economics_econometrics_finance` | `VARCHAR(100)` | ASJC subject area classification |
-| 25 | 2100 Energy | `asjc_2100_energy` | `VARCHAR(100)` | ASJC subject area classification |
-| 26 | 2200 Engineering | `asjc_2200_engineering` | `VARCHAR(100)` | ASJC subject area classification |
-| 27 | 2300 Environmental Science | `asjc_2300_environmental_science` | `VARCHAR(100)` | ASJC subject area classification |
-| 28 | 2400 Immunology and Microbiology | `asjc_2400_immunology_and_microbiology` | `VARCHAR(100)` | ASJC subject area classification |
-| 29 | 2500 Materials Science | `asjc_2500_materials_science` | `VARCHAR(100)` | ASJC subject area classification |
-| 30 | 2600 Mathematics | `asjc_2600_mathematics` | `VARCHAR(100)` | ASJC subject area classification |
-| 31 | 2700 Medicine | `asjc_2700_medicine` | `VARCHAR(100)` | ASJC subject area classification |
-| 32 | 2800 Neuroscience | `asjc_2800_neuroscience` | `VARCHAR(100)` | ASJC subject area classification |
-| 33 | 2900 Nursing | `asjc_2900_nursing` | `VARCHAR(100)` | ASJC subject area classification |
-| 34 | 3000 Pharmacology, Toxicology and Pharmaceutics | `asjc_3000_pharmacology_toxicology_pharmaceutics` | `VARCHAR(100)` | ASJC subject area classification |
-| 35 | 3100 Physics and Astronomy | `asjc_3100_physics_and_astronomy` | `VARCHAR(100)` | ASJC subject area classification |
-| 36 | 3200 Psychology | `asjc_3200_psychology` | `VARCHAR(100)` | ASJC subject area classification |
-| 37 | 3300 Social Sciences | `asjc_3300_social_sciences` | `VARCHAR(100)` | ASJC subject area classification |
-| 38 | 3400 Veterinary | `asjc_3400_veterinary` | `VARCHAR(100)` | ASJC subject area classification |
-| 39 | 3500 Dentistry | `asjc_3500_dentistry` | `VARCHAR(100)` | ASJC subject area classification |
-| 40 | 3600 Health Professions | `asjc_3600_health_professions` | `VARCHAR(100)` | ASJC subject area classification |
+
+*Note: Scopus area data (ASJC codes and top-level categories) have been normalized into separate tables: `SCOPUS_AREA`, `SCOPUS_AREA_GROUP`, and `SCOPUS_MAJOR_GROUP` with their respective join tables.*
 
 ## Journal Area Database
 
@@ -162,3 +133,48 @@
 | 1 | `journal_id` | `INTEGER`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
 | 2 | `major_group_id` | `INTEGER`, FK → `MAJOR_GROUP.major_group_id` | References the major group in `MAJOR_GROUP` |
 | — | Composite PK | `(journal_id, major_group_id)` | A journal can belong to multiple major groups; each (journal, major_group) pair is unique |
+
+## SCOPUS_AREA (Scopus ASJC Area Lookup)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `scopus_area_id` | `SERIAL PRIMARY KEY` | Auto-incrementing unique identifier for each Scopus ASJC area |
+| 2 | `scopus_area_name` | `VARCHAR(200) UNIQUE` | ASJC area name (e.g. "1000 General", "1700 Computer Science", "2700 Medicine") |
+
+## JOURNAL_SCOPUS_AREA_DETAIL (Journal-ScopusArea Many-to-Many)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `journal_id` | `INTEGER`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
+| 2 | `scopus_area_id` | `INTEGER`, FK → `SCOPUS_AREA.scopus_area_id` | References the Scopus ASJC area |
+| — | Composite PK | `(journal_id, scopus_area_id)` | A journal can have multiple Scopus areas; each (journal, scopus_area) pair is unique |
+
+## SCOPUS_AREA_GROUP (Scopus Top-Level Area Group Lookup)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `scopus_area_group_id` | `SERIAL PRIMARY KEY` | Auto-incrementing unique identifier for each Scopus top-level area group |
+| 2 | `scopus_area_group_name` | `VARCHAR(100) UNIQUE` | Top-level area group name: "Life Sciences", "Social Sciences", "Physical Sciences", "Health Sciences" |
+
+## JOURNAL_SCOPUS_AREA_GROUP_DETAIL (Journal-ScopusAreaGroup Many-to-Many)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `journal_id` | `INTEGER`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
+| 2 | `scopus_area_group_id` | `INTEGER`, FK → `SCOPUS_AREA_GROUP.scopus_area_group_id` | References the Scopus top-level area group |
+| — | Composite PK | `(journal_id, scopus_area_group_id)` | A journal can belong to multiple Scopus area groups; each (journal, scopus_area_group) pair is unique |
+
+## SCOPUS_MAJOR_GROUP (Scopus Major Group Lookup)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `scopus_major_group_id` | `SERIAL PRIMARY KEY` | Auto-incrementing unique identifier for each Scopus major group |
+| 2 | `scopus_major_group_name` | `VARCHAR(100) UNIQUE` | Scopus major group name (e.g. "Arts & Humanities", "Business & Economics", "Engineering & Technology", "Health & Life Sciences", "Social Sciences", "Environmental & Interdisciplinary") |
+
+## JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL (Journal-ScopusMajorGroup Many-to-Many)
+
+| # | Column | Type | Description |
+|---|--------|------|-------------|
+| 1 | `journal_id` | `INTEGER`, FK → `JOURNAL_MAIN.id` | References the journal in `JOURNAL_MAIN` |
+| 2 | `scopus_major_group_id` | `INTEGER`, FK → `SCOPUS_MAJOR_GROUP.scopus_major_group_id` | References the Scopus major group |
+| — | Composite PK | `(journal_id, scopus_major_group_id)` | A journal can belong to multiple Scopus major groups; each (journal, scopus_major_group) pair is unique |

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useJournalAreas } from "@/hooks/useJournalAreas";
 import { useFilters } from "@/hooks/useFilters";
 import { useCounters } from "@/hooks/useCounters";
@@ -120,6 +121,7 @@ function ComboboxFilter({
 }
 
 export default function AreaExplorer() {
+  const router = useRouter();
   const [majorGroup, setMajorGroup] = useState<string | null>(null);
   const [areaGroup, setAreaGroup] = useState<string | null>(null);
   const [area, setArea] = useState<string | null>(null);
@@ -265,7 +267,7 @@ export default function AreaExplorer() {
                   }) => (
                     <TableRow
                       key={journal.id}
-                      onClick={() => alert(`Journal detail page TBD for: ${journal.journal_title}`)}
+                      onClick={() => router.push(`/journal/${journal.id}`)}
                       className="cursor-pointer"
                     >
                       <TableCell className="font-medium">

@@ -139,27 +139,8 @@ async function seedScimago() {
 async function seedScopus() {
   const rows = readCsv("SCOPUS_DB.csv");
 
-  const asjcFields = [
-    "asjc_1000_general", "asjc_1100_agricultural_and_biological_sciences",
-    "asjc_1200_arts_and_humanities", "asjc_1300_biochemistry_genetics_molecular_biology",
-    "asjc_1400_business_management_accounting", "asjc_1500_chemical_engineering",
-    "asjc_1600_chemistry", "asjc_1700_computer_science", "asjc_1800_decision_sciences",
-    "asjc_1900_earth_and_planetary_sciences", "asjc_2000_economics_econometrics_finance",
-    "asjc_2100_energy", "asjc_2200_engineering", "asjc_2300_environmental_science",
-    "asjc_2400_immunology_and_microbiology", "asjc_2500_materials_science",
-    "asjc_2600_mathematics", "asjc_2700_medicine", "asjc_2800_neuroscience",
-    "asjc_2900_nursing", "asjc_3000_pharmacology_toxicology_pharmaceutics",
-    "asjc_3100_physics_and_astronomy", "asjc_3200_psychology",
-    "asjc_3300_social_sciences", "asjc_3400_veterinary", "asjc_3500_dentistry",
-    "asjc_3600_health_professions",
-  ];
-
   for (const row of rows) {
     const id = parseInt(row.id, 10);
-    const asjcData: Record<string, string | null> = {};
-    for (const field of asjcFields) {
-      asjcData[field] = emptyToNull(row[field]);
-    }
 
     await prisma.sCOPUS_DB.upsert({
       where: { id },
@@ -172,11 +153,6 @@ async function seedScopus() {
         coverage_years: emptyToNull(row.coverage_years),
         discontinued: emptyToNull(row.discontinued),
         source_type: emptyToNull(row.source_type),
-        top_level_life_sciences: emptyToNull(row.top_level_life_sciences),
-        top_level_social_sciences: emptyToNull(row.top_level_social_sciences),
-        top_level_physical_sciences: emptyToNull(row.top_level_physical_sciences),
-        top_level_health_sciences: emptyToNull(row.top_level_health_sciences),
-        ...asjcData,
       },
       create: {
         id,
@@ -188,11 +164,6 @@ async function seedScopus() {
         coverage_years: emptyToNull(row.coverage_years),
         discontinued: emptyToNull(row.discontinued),
         source_type: emptyToNull(row.source_type),
-        top_level_life_sciences: emptyToNull(row.top_level_life_sciences),
-        top_level_social_sciences: emptyToNull(row.top_level_social_sciences),
-        top_level_physical_sciences: emptyToNull(row.top_level_physical_sciences),
-        top_level_health_sciences: emptyToNull(row.top_level_health_sciences),
-        ...asjcData,
       },
     });
   }
@@ -227,24 +198,21 @@ async function seedNote() {
 
 async function seedJournalArea() {
   const rows = readCsv("journal_area.csv");
-  for (const row of rows) {
-    await prisma.journal_area.create({
-      data: {
-        journal_title: row.journal_title.trim(),
-        issn_print: emptyToNull(row.issn_print),
-        issn_online: emptyToNull(row.issn_online),
-        source: row.source.trim(),
-        area: emptyToNull(row.area),
-        rank: emptyToNull(row.rank),
-        active_status: emptyToNull(row.active_status),
-        source_type: emptyToNull(row.source_type),
-        best_rank: emptyToNull(row.best_rank),
-        area_group: emptyToNull(row.area_group),
-        major_group: row.major_group.trim(),
-      },
-    });
-  }
-  console.log(`Seeded ${rows.length} journal_area rows`);
+  const data = rows.map(row => ({
+    journal_title: row.journal_title.trim(),
+    issn_print: emptyToNull(row.issn_print),
+    issn_online: emptyToNull(row.issn_online),
+    source: row.source.trim(),
+    area: emptyToNull(row.area),
+    rank: emptyToNull(row.rank),
+    active_status: emptyToNull(row.active_status),
+    source_type: emptyToNull(row.source_type),
+    best_rank: emptyToNull(row.best_rank),
+    area_group: emptyToNull(row.area_group),
+    major_group: row.major_group.trim(),
+  }));
+  await prisma.journal_area.createMany({ data });
+  console.log(`Seeded ${data.length} journal_area rows`);
 }
 
 async function seedArea() {
@@ -258,15 +226,10 @@ async function seedArea() {
     }
   }
   
-  for (const areaName of uniqueAreas) {
-    await prisma.aREA.upsert({
-      where: { area_name: areaName },
-      update: {},
-      create: {
-        area_name: areaName,
-      },
-    });
-  }
+  await prisma.aREA.createMany({
+    data: [...uniqueAreas].map(areaName => ({ area_name: areaName })),
+    skipDuplicates: true,
+  });
   console.log(`Seeded ${uniqueAreas.size} AREA rows`);
 }
 
@@ -325,15 +288,10 @@ async function seedAreaGroup() {
     }
   }
   
-  for (const areaGroupName of uniqueAreaGroups) {
-    await prisma.aREA_GROUP.upsert({
-      where: { area_group_name: areaGroupName },
-      update: {},
-      create: {
-        area_group_name: areaGroupName,
-      },
-    });
-  }
+  await prisma.aREA_GROUP.createMany({
+    data: [...uniqueAreaGroups].map(name => ({ area_group_name: name })),
+    skipDuplicates: true,
+  });
   console.log(`Seeded ${uniqueAreaGroups.size} AREA_GROUP rows`);
 }
 
@@ -392,15 +350,10 @@ async function seedMajorGroup() {
     }
   }
   
-  for (const majorGroupName of uniqueMajorGroups) {
-    await prisma.mAJOR_GROUP.upsert({
-      where: { major_group_name: majorGroupName },
-      update: {},
-      create: {
-        major_group_name: majorGroupName,
-      },
-    });
-  }
+  await prisma.mAJOR_GROUP.createMany({
+    data: [...uniqueMajorGroups].map(name => ({ major_group_name: name })),
+    skipDuplicates: true,
+  });
   console.log(`Seeded ${uniqueMajorGroups.size} MAJOR_GROUP rows`);
 }
 
@@ -448,6 +401,263 @@ async function seedJournalMajorGroupDetail() {
   console.log(`Seeded ${data.length} JOURNAL_MAJOR_GROUP_DETAIL rows`);
 }
 
+async function seedScopusArea() {
+  const rows = readCsv("SCOPUS_DB.csv");
+
+  const asjcColumns: Record<string, string> = {
+    asjc_1000_general: "1000 General",
+    asjc_1100_agricultural_and_biological_sciences: "1100 Agricultural and Biological Sciences",
+    asjc_1200_arts_and_humanities: "1200 Arts and Humanities",
+    asjc_1300_biochemistry_genetics_molecular_biology: "1300 Biochemistry, Genetics and Molecular Biology",
+    asjc_1400_business_management_accounting: "1400 Business, Management and Accounting",
+    asjc_1500_chemical_engineering: "1500 Chemical Engineering",
+    asjc_1600_chemistry: "1600 Chemistry",
+    asjc_1700_computer_science: "1700 Computer Science",
+    asjc_1800_decision_sciences: "1800 Decision Sciences",
+    asjc_1900_earth_and_planetary_sciences: "1900 Earth and Planetary Sciences",
+    asjc_2000_economics_econometrics_finance: "2000 Economics, Econometrics and Finance",
+    asjc_2100_energy: "2100 Energy",
+    asjc_2200_engineering: "2200 Engineering",
+    asjc_2300_environmental_science: "2300 Environmental Science",
+    asjc_2400_immunology_and_microbiology: "2400 Immunology and Microbiology",
+    asjc_2500_materials_science: "2500 Materials Science",
+    asjc_2600_mathematics: "2600 Mathematics",
+    asjc_2700_medicine: "2700 Medicine",
+    asjc_2800_neuroscience: "2800 Neuroscience",
+    asjc_2900_nursing: "2900 Nursing",
+    asjc_3000_pharmacology_toxicology_pharmaceutics: "3000 Pharmacology, Toxicology and Pharmaceutics",
+    asjc_3100_physics_and_astronomy: "3100 Physics and Astronomy",
+    asjc_3200_psychology: "3200 Psychology",
+    asjc_3300_social_sciences: "3300 Social Sciences",
+    asjc_3400_veterinary: "3400 Veterinary",
+    asjc_3500_dentistry: "3500 Dentistry",
+    asjc_3600_health_professions: "3600 Health Professions",
+  };
+
+  const uniqueAreas = new Set<string>();
+
+  for (const row of rows) {
+    for (const [col, areaName] of Object.entries(asjcColumns)) {
+      if (emptyToNull(row[col])) {
+        uniqueAreas.add(areaName);
+      }
+    }
+  }
+
+  await prisma.sCOPUS_AREA.createMany({
+    data: [...uniqueAreas].map(areaName => ({ scopus_area_name: areaName })),
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${uniqueAreas.size} SCOPUS_AREA rows`);
+}
+
+async function seedScopusAreaGroup() {
+  const rows = readCsv("SCOPUS_DB.csv");
+
+  const topLevelColumns: Record<string, string> = {
+    top_level_life_sciences: "Life Sciences",
+    top_level_social_sciences: "Social Sciences",
+    top_level_physical_sciences: "Physical Sciences",
+    top_level_health_sciences: "Health Sciences",
+  };
+
+  const uniqueAreaGroups = new Set<string>();
+
+  for (const row of rows) {
+    for (const [col, groupName] of Object.entries(topLevelColumns)) {
+      if (emptyToNull(row[col])) {
+        uniqueAreaGroups.add(groupName);
+      }
+    }
+  }
+
+  await prisma.sCOPUS_AREA_GROUP.createMany({
+    data: [...uniqueAreaGroups].map(name => ({ scopus_area_group_name: name })),
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${uniqueAreaGroups.size} SCOPUS_AREA_GROUP rows`);
+}
+
+async function seedScopusMajorGroup() {
+  const rows = readCsv("journal_area.csv");
+  const uniqueMajorGroups = new Set<string>();
+
+  for (const row of rows) {
+    if (row.source?.trim() !== "Scopus") continue;
+    const majorGroup = row.major_group?.trim();
+    if (majorGroup) {
+      uniqueMajorGroups.add(majorGroup);
+    }
+  }
+
+  await prisma.sCOPUS_MAJOR_GROUP.createMany({
+    data: [...uniqueMajorGroups].map(name => ({ scopus_major_group_name: name })),
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${uniqueMajorGroups.size} SCOPUS_MAJOR_GROUP rows`);
+}
+
+async function seedJournalScopusAreaDetail() {
+  const rows = readCsv("SCOPUS_DB.csv");
+
+  const asjcColumns: Record<string, string> = {
+    asjc_1000_general: "1000 General",
+    asjc_1100_agricultural_and_biological_sciences: "1100 Agricultural and Biological Sciences",
+    asjc_1200_arts_and_humanities: "1200 Arts and Humanities",
+    asjc_1300_biochemistry_genetics_molecular_biology: "1300 Biochemistry, Genetics and Molecular Biology",
+    asjc_1400_business_management_accounting: "1400 Business, Management and Accounting",
+    asjc_1500_chemical_engineering: "1500 Chemical Engineering",
+    asjc_1600_chemistry: "1600 Chemistry",
+    asjc_1700_computer_science: "1700 Computer Science",
+    asjc_1800_decision_sciences: "1800 Decision Sciences",
+    asjc_1900_earth_and_planetary_sciences: "1900 Earth and Planetary Sciences",
+    asjc_2000_economics_econometrics_finance: "2000 Economics, Econometrics and Finance",
+    asjc_2100_energy: "2100 Energy",
+    asjc_2200_engineering: "2200 Engineering",
+    asjc_2300_environmental_science: "2300 Environmental Science",
+    asjc_2400_immunology_and_microbiology: "2400 Immunology and Microbiology",
+    asjc_2500_materials_science: "2500 Materials Science",
+    asjc_2600_mathematics: "2600 Mathematics",
+    asjc_2700_medicine: "2700 Medicine",
+    asjc_2800_neuroscience: "2800 Neuroscience",
+    asjc_2900_nursing: "2900 Nursing",
+    asjc_3000_pharmacology_toxicology_pharmaceutics: "3000 Pharmacology, Toxicology and Pharmaceutics",
+    asjc_3100_physics_and_astronomy: "3100 Physics and Astronomy",
+    asjc_3200_psychology: "3200 Psychology",
+    asjc_3300_social_sciences: "3300 Social Sciences",
+    asjc_3400_veterinary: "3400 Veterinary",
+    asjc_3500_dentistry: "3500 Dentistry",
+    asjc_3600_health_professions: "3600 Health Professions",
+  };
+
+  const areas = await prisma.sCOPUS_AREA.findMany({
+    select: { scopus_area_id: true, scopus_area_name: true },
+  });
+  const nameToId = new Map(areas.map(a => [a.scopus_area_name, a.scopus_area_id]));
+
+  const pairs = new Set<string>();
+  const data = [];
+
+  for (const row of rows) {
+    const journalId = parseInt(row.id, 10);
+    if (isNaN(journalId)) continue;
+
+    for (const [col, areaName] of Object.entries(asjcColumns)) {
+      if (!emptyToNull(row[col])) continue;
+
+      const areaId = nameToId.get(areaName);
+      if (!areaId) continue;
+
+      const pairKey = `${journalId}-${areaId}`;
+      if (pairs.has(pairKey)) continue;
+
+      pairs.add(pairKey);
+      data.push({
+        journal_id: journalId,
+        scopus_area_id: areaId,
+      });
+    }
+  }
+
+  await prisma.jOURNAL_SCOPUS_AREA_DETAIL.createMany({
+    data,
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${data.length} JOURNAL_SCOPUS_AREA_DETAIL rows`);
+}
+
+async function seedJournalScopusAreaGroupDetail() {
+  const rows = readCsv("SCOPUS_DB.csv");
+
+  const topLevelColumns: Record<string, string> = {
+    top_level_life_sciences: "Life Sciences",
+    top_level_social_sciences: "Social Sciences",
+    top_level_physical_sciences: "Physical Sciences",
+    top_level_health_sciences: "Health Sciences",
+  };
+
+  const areaGroups = await prisma.sCOPUS_AREA_GROUP.findMany({
+    select: { scopus_area_group_id: true, scopus_area_group_name: true },
+  });
+  const nameToId = new Map(areaGroups.map(ag => [ag.scopus_area_group_name, ag.scopus_area_group_id]));
+
+  const pairs = new Set<string>();
+  const data = [];
+
+  for (const row of rows) {
+    const journalId = parseInt(row.id, 10);
+    if (isNaN(journalId)) continue;
+
+    for (const [col, groupName] of Object.entries(topLevelColumns)) {
+      if (!emptyToNull(row[col])) continue;
+
+      const areaGroupId = nameToId.get(groupName);
+      if (!areaGroupId) continue;
+
+      const pairKey = `${journalId}-${areaGroupId}`;
+      if (pairs.has(pairKey)) continue;
+
+      pairs.add(pairKey);
+      data.push({
+        journal_id: journalId,
+        scopus_area_group_id: areaGroupId,
+      });
+    }
+  }
+
+  await prisma.jOURNAL_SCOPUS_AREA_GROUP_DETAIL.createMany({
+    data,
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${data.length} JOURNAL_SCOPUS_AREA_GROUP_DETAIL rows`);
+}
+
+async function seedJournalScopusMajorGroupDetail() {
+  const rows = readCsv("journal_area.csv");
+
+  const journals = await prisma.jOURNAL_MAIN.findMany({
+    select: { id: true, journal_title: true },
+  });
+  const titleToId = new Map(journals.map(j => [j.journal_title, j.id]));
+
+  const majorGroups = await prisma.sCOPUS_MAJOR_GROUP.findMany({
+    select: { scopus_major_group_id: true, scopus_major_group_name: true },
+  });
+  const nameToId = new Map(majorGroups.map(mg => [mg.scopus_major_group_name, mg.scopus_major_group_id]));
+
+  const pairs = new Set<string>();
+  const data = [];
+
+  for (const row of rows) {
+    if (row.source?.trim() !== "Scopus") continue;
+
+    const title = row.journal_title.trim();
+    const majorGroup = row.major_group?.trim();
+
+    if (!majorGroup) continue;
+
+    const journalId = titleToId.get(title);
+    const majorGroupId = nameToId.get(majorGroup);
+
+    if (!journalId || !majorGroupId) continue;
+
+    const pairKey = `${journalId}-${majorGroupId}`;
+    if (pairs.has(pairKey)) continue;
+
+    pairs.add(pairKey);
+    data.push({
+      journal_id: journalId,
+      scopus_major_group_id: majorGroupId,
+    });
+  }
+
+  await prisma.jOURNAL_SCOPUS_MAJOR_GROUP_DETAIL.createMany({
+    data,
+    skipDuplicates: true,
+  });
+  console.log(`Seeded ${data.length} JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL rows`);
+}
+
 async function main() {
   console.log("Seeding database...");
   await seedJournalMain();
@@ -463,6 +673,12 @@ async function main() {
   await seedJournalAreaGroupDetail();
   await seedMajorGroup();
   await seedJournalMajorGroupDetail();
+  await seedScopusArea();
+  await seedScopusAreaGroup();
+  await seedScopusMajorGroup();
+  await seedJournalScopusAreaDetail();
+  await seedJournalScopusAreaGroupDetail();
+  await seedJournalScopusMajorGroupDetail();
   console.log("Seeding complete!");
 }
 

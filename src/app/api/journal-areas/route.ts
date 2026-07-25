@@ -7,6 +7,8 @@ export async function GET(request: NextRequest) {
   const area = searchParams.get("area");
   const areaGroup = searchParams.get("areaGroup");
   const majorGroup = searchParams.get("majorGroup");
+  const source = searchParams.get("source");
+  const rank = searchParams.get("rank");
   const page = parseInt(searchParams.get("page") ?? "1");
   const limit = parseInt(searchParams.get("limit") ?? "10");
 
@@ -40,6 +42,40 @@ export async function GET(request: NextRequest) {
         },
       },
     };
+  }
+
+  if (source) {
+    const sourceMap: Record<string, Record<string, unknown>> = {
+      ABDC: { abdc: { isNot: null } },
+      AJG: { ajg: { isNot: null } },
+      Scimago: { scimago: { isNot: null } },
+      Scopus: { scopus: { isNot: null } },
+    };
+    const sourceFilter = sourceMap[source];
+    if (sourceFilter) {
+      Object.assign(where, sourceFilter);
+    }
+  }
+
+  if (rank) {
+    const abdcRanks = ["A*", "A", "B", "C"];
+    const ajgRanks = ["4*", "4", "3", "2", "1"];
+    const scimagoRanks = ["Q1", "Q2", "Q3", "Q4"];
+
+    const rankConditions: Record<string, unknown>[] = [];
+    if (abdcRanks.includes(rank)) {
+      rankConditions.push({ abdc: { rating_2025: rank } });
+    }
+    if (ajgRanks.includes(rank)) {
+      rankConditions.push({ ajg: { ajg_2024_rating: rank } });
+    }
+    if (scimagoRanks.includes(rank)) {
+      rankConditions.push({ scimago: { sjr_best_quartile: rank } });
+    }
+
+    if (rankConditions.length > 0) {
+      where.OR = rankConditions;
+    }
   }
 
   const [journals, total] = await Promise.all([

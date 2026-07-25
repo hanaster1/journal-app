@@ -10,9 +10,15 @@ erDiagram
     JOURNAL_MAIN ||--o{ JOURNAL_AREA_DETAIL : "journal_id"
     JOURNAL_MAIN ||--o{ JOURNAL_AREA_GROUP_DETAIL : "journal_id"
     JOURNAL_MAIN ||--o{ JOURNAL_MAJOR_GROUP_DETAIL : "journal_id"
+    JOURNAL_MAIN ||--o{ JOURNAL_SCOPUS_AREA_DETAIL : "journal_id"
+    JOURNAL_MAIN ||--o{ JOURNAL_SCOPUS_AREA_GROUP_DETAIL : "journal_id"
+    JOURNAL_MAIN ||--o{ JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL : "journal_id"
     JOURNAL_AREA_DETAIL }o--|| AREA : "area_id"
     JOURNAL_AREA_GROUP_DETAIL }o--|| AREA_GROUP : "area_group_id"
     JOURNAL_MAJOR_GROUP_DETAIL }o--|| MAJOR_GROUP : "major_group_id"
+    JOURNAL_SCOPUS_AREA_DETAIL }o--|| SCOPUS_AREA : "scopus_area_id"
+    JOURNAL_SCOPUS_AREA_GROUP_DETAIL }o--|| SCOPUS_AREA_GROUP : "scopus_area_group_id"
+    JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL }o--|| SCOPUS_MAJOR_GROUP : "scopus_major_group_id"
 
     JOURNAL_MAIN {
         int id "PK"
@@ -61,17 +67,6 @@ erDiagram
         varchar coverage_years "Coverage Years"
         varchar discontinued "Discontinued"
         varchar source_type "Source Type (Journal, etc.)"
-        varchar top_level_life_sciences "Life Sciences"
-        varchar top_level_social_sciences "Social Sciences"
-        varchar top_level_physical_sciences "Physical Sciences"
-        varchar top_level_health_sciences "Health Sciences"
-        varchar asjc_1000_general "ASJC General"
-        varchar asjc_1400_business "Business, Management..."
-        varchar asjc_1700_computer_science "Computer Science"
-        varchar asjc_2000_economics "Economics..."
-        varchar asjc_2700_medicine "Medicine"
-        varchar asjc_3200_psychology "Psychology"
-        varchar asjc_3300_social_sciences "Social Sciences"
     }
 
     NOTE_DB {
@@ -127,7 +122,37 @@ erDiagram
         int journal_id "PK FK"
         int major_group_id "PK FK"
     }
-```
+
+    SCOPUS_AREA {
+        int scopus_area_id "PK (auto-increment)"
+        varchar scopus_area_name "ASJC Area Name (unique)"
+    }
+
+    JOURNAL_SCOPUS_AREA_DETAIL {
+        int journal_id "PK FK"
+        int scopus_area_id "PK FK"
+    }
+
+    SCOPUS_AREA_GROUP {
+        int scopus_area_group_id "PK (auto-increment)"
+        varchar scopus_area_group_name "Top-Level Area Group (unique)"
+    }
+
+    JOURNAL_SCOPUS_AREA_GROUP_DETAIL {
+        int journal_id "PK FK"
+        int scopus_area_group_id "PK FK"
+    }
+
+    SCOPUS_MAJOR_GROUP {
+        int scopus_major_group_id "PK (auto-increment)"
+        varchar scopus_major_group_name "Major Group Name (unique)"
+    }
+
+    JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL {
+        int journal_id "PK FK"
+        int scopus_major_group_id "PK FK"
+    }
+    ```
 
 ## Relationships
 
@@ -141,7 +166,13 @@ erDiagram
 | `JOURNAL_MAIN` | `JOURNAL_AREA_DETAIL` | One-to-Many | Each journal may have multiple area associations |
 | `JOURNAL_MAIN` | `JOURNAL_AREA_GROUP_DETAIL` | One-to-Many | Each journal may have multiple area group associations |
 | `JOURNAL_MAIN` | `JOURNAL_MAJOR_GROUP_DETAIL` | One-to-Many | Each journal may have multiple major group associations |
+| `JOURNAL_MAIN` | `JOURNAL_SCOPUS_AREA_DETAIL` | One-to-Many | Each journal may have multiple Scopus ASJC area associations |
+| `JOURNAL_MAIN` | `JOURNAL_SCOPUS_AREA_GROUP_DETAIL` | One-to-Many | Each journal may have multiple Scopus top-level area group associations |
+| `JOURNAL_MAIN` | `JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL` | One-to-Many | Each journal may have multiple Scopus major group associations |
 | `AREA` | `JOURNAL_AREA_DETAIL` | One-to-Many | Each area may be associated with multiple journals |
 | `AREA_GROUP` | `JOURNAL_AREA_GROUP_DETAIL` | One-to-Many | Each area group may be associated with multiple journals |
 | `MAJOR_GROUP` | `JOURNAL_MAJOR_GROUP_DETAIL` | One-to-Many | Each major group may be associated with multiple journals |
+| `SCOPUS_AREA` | `JOURNAL_SCOPUS_AREA_DETAIL` | One-to-Many | Each Scopus ASJC area may be associated with multiple journals |
+| `SCOPUS_AREA_GROUP` | `JOURNAL_SCOPUS_AREA_GROUP_DETAIL` | One-to-Many | Each Scopus top-level area group may be associated with multiple journals |
+| `SCOPUS_MAJOR_GROUP` | `JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL` | One-to-Many | Each Scopus major group may be associated with multiple journals |
 | — | `journal_area` | Standalone | A denormalized/aggregated view combining data from all source databases |

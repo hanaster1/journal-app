@@ -30,18 +30,34 @@ Root is a single Next.js app (no monorepo). Expected layout:
 │   │   ├── page.tsx           # Overview (homepage)
 │   │   ├── area-explorer/
 │   │   ├── journal-search/
+│   │   │   ├── page.tsx
+│   │   │   ├── components/    # Page-specific components
+│   │   │   ├── hooks/         # Page-specific hooks
+│   │   │   └── lib/           # Page-specific utilities
+│   │   ├── journal/[id]/      # Journal detail page
 │   │   └── layout.tsx
-│   ├── components/            # shadcn/ui components + custom
+│   ├── components/            # shadcn/ui components + shared custom
+│   │   └── ui/                # shadcn/ui primitives
 │   ├── lib/
 │   │   ├── db.ts              # Prisma client singleton
 │   │   └── validations/       # Zod schemas
-│   ├── hooks/                 # TanStack Query hooks
+│   ├── hooks/                 # Shared TanStack Query hooks
 │   └── types/
 ├── database/                  # Source CSVs (read-only reference)
+├── change-request/            # Change request documents and plans
 ├── er-diagram.md
 ├── DESIGN.md                  # Design system, colors, typography, layout
 └── AGENTS.md
 ```
+
+### Page-level organization
+
+Complex pages (like `journal-search`) use a co-located structure:
+- `components/` — Components used only by this page
+- `hooks/` — Hooks used only by this page (e.g., `use-search-state.ts`, `use-journal-search.ts`)
+- `lib/` — Utilities and constants for this page (e.g., `search-utils.ts`)
+
+Shared components and hooks go in `src/components/` and `src/hooks/`.
 
 ## Database schema (Prisma models)
 
@@ -90,11 +106,6 @@ Hub table `JOURNAL_MAIN` with satellite tables and normalized many-to-many relat
 - `coverage_years` String?
 - `discontinued` String?
 - `source_type` String?
-- `top_level_life_sciences` String?
-- `top_level_social_sciences` String?
-- `top_level_physical_sciences` String?
-- `top_level_health_sciences` String?
-- plus 26 ASJC columns (`asjc_1000_general`…`asjc_3600_health_professions`) all String?
 
 ### `NOTE_DB`
 - `id` Int PK (FK → JOURNAL_MAIN.id)
@@ -145,7 +156,34 @@ Hub table `JOURNAL_MAIN` with satellite tables and normalized many-to-many relat
 - `major_group_id` Int (FK → MAJOR_GROUP.major_group_id)
 - Composite PK (`journal_id`, `major_group_id`)
 
-JOURNAL_MAIN is the hub; ABDC/AJG/SCIMAGO/SCOPUS/NOTE each have a 1:0..1 relation keyed on `id`. AREA, AREA_GROUP, and MAJOR_GROUP are linked to journals through their respective detail (join) tables.
+### `SCOPUS_AREA` (Scopus ASJC area lookup)
+- `scopus_area_id` Int PK (auto-increment)
+- `scopus_area_name` String @unique
+
+### `JOURNAL_SCOPUS_AREA_DETAIL` (journal ↔ scopus_area many-to-many)
+- `journal_id` Int (FK → JOURNAL_MAIN.id)
+- `scopus_area_id` Int (FK → SCOPUS_AREA.scopus_area_id)
+- Composite PK (`journal_id`, `scopus_area_id`)
+
+### `SCOPUS_AREA_GROUP` (Scopus top-level area group lookup)
+- `scopus_area_group_id` Int PK (auto-increment)
+- `scopus_area_group_name` String @unique
+
+### `JOURNAL_SCOPUS_AREA_GROUP_DETAIL` (journal ↔ scopus_area_group many-to-many)
+- `journal_id` Int (FK → JOURNAL_MAIN.id)
+- `scopus_area_group_id` Int (FK → SCOPUS_AREA_GROUP.scopus_area_group_id)
+- Composite PK (`journal_id`, `scopus_area_group_id`)
+
+### `SCOPUS_MAJOR_GROUP` (Scopus major group lookup)
+- `scopus_major_group_id` Int PK (auto-increment)
+- `scopus_major_group_name` String @unique
+
+### `JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL` (journal ↔ scopus_major_group many-to-many)
+- `journal_id` Int (FK → JOURNAL_MAIN.id)
+- `scopus_major_group_id` Int (FK → SCOPUS_MAJOR_GROUP.scopus_major_group_id)
+- Composite PK (`journal_id`, `scopus_major_group_id`)
+
+JOURNAL_MAIN is the hub; ABDC/AJG/SCIMAGO/SCOPUS/NOTE each have a 1:0..1 relation keyed on `id`. AREA, AREA_GROUP, and MAJOR_GROUP are linked to journals through their respective detail (join) tables. SCOPUS_AREA, SCOPUS_AREA_GROUP, and SCOPUS_MAJOR_GROUP are Scopus-specific normalized tables linked through their own join tables.
 
 ## Seed data
 
@@ -161,13 +199,35 @@ Prisma seed script should read CSVs and upsert by `id`. Some AJG/Scimago/Scopus 
 
 ## Pages
 
-Three pages in App Router:
+Four pages in App Router:
 
 | Route | Purpose |
 |-------|---------|
 | `/` | Overview — summary stats, top journals, key metrics |
 | `/area-explorer` | Browse journals by ABDC area / major group / area group |
-| `/journal-search` | Full-text search across journal titles, ISSNs, filtering by source/rating/area |
+| `/journal-search` | Full-text search with advanced filtering, sorting, and pagination |
+| `/journal/[id]` | Journal detail page — displays full information for a single journal |
+
+### Journal Search specifics
+
+- **Search**: Debounced input (300ms) searches across journal title, ISSN, publisher, and all title variants
+- **Filters**: 15 filter dimensions accessible via Sheet drawer (all screen sizes):
+  - Database Source, ABDC Rating, AJG Rating, SJR Quartile (checkbox groups)
+  - ABDC Area, AJG Subject Area, Major Group, Area Group, Scopus Area, Scopus Area Group, Publisher (searchable comboboxes)
+  - Active Status, Source Type (checkbox groups)
+  - Year Inception (range inputs)
+- **Sort**: Title (A-Z, Z-A), Publisher, Year — via Combobox component
+- **View toggle**: Table view (default on desktop) or Card view (default on mobile)
+- **Pagination**: Page size selector (20/50/100), page navigation with ellipsis
+- **URL state**: All search/filter/sort state synced to URL params for shareable links
+- **Row/card click**: Navigates to `/journal/{id}`
+- **Rating badges**: Tiered badge system per DESIGN.md (5 tiers based on rating value)
+
+### Journal Detail specifics
+
+- **Route**: `/journal/[id]` where `id` is `JOURNAL_MAIN.id`
+- **Navigation**: Accessed by clicking a journal row/card in search results or area explorer
+- **Content**: Displays full journal information including all ratings, ISSNs, areas, and metadata
 
 ### Area Explorer specifics
 

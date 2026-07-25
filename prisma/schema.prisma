@@ -18,13 +18,16 @@ model JOURNAL_MAIN {
   scopus  SCOPUS_DB?
   note    NOTE_DB?
 
-  journalAreaDetails       JOURNAL_AREA_DETAIL[]
-  journalAreaGroupDetails  JOURNAL_AREA_GROUP_DETAIL[]
-  journalMajorGroupDetails JOURNAL_MAJOR_GROUP_DETAIL[]
+  journalAreaDetails             JOURNAL_AREA_DETAIL[]
+  journalAreaGroupDetails        JOURNAL_AREA_GROUP_DETAIL[]
+  journalMajorGroupDetails       JOURNAL_MAJOR_GROUP_DETAIL[]
+  journalScopusAreaDetails       JOURNAL_SCOPUS_AREA_DETAIL[]
+  journalScopusAreaGroupDetails  JOURNAL_SCOPUS_AREA_GROUP_DETAIL[]
+  journalScopusMajorGroupDetails JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL[]
 }
 
 model ABDC_DB {
-  id             Int    @id
+  id             Int     @id
   issn_print     String?
   issn_online    String?
   year_inception Int?
@@ -48,59 +51,28 @@ model AJG_DB {
 }
 
 model SCIMAGO_DB {
-  id                  Int     @id
-  scimago_issn        String?
-  scimago_eissn       String?
-  scimago_title       String?
-  sjr_best_quartile   String?
-  scimago_categories  String?
-  scimago_match_key   String?
-  scimago_areas       String?
+  id                 Int     @id
+  scimago_issn       String?
+  scimago_eissn      String?
+  scimago_title      String?
+  sjr_best_quartile  String?
+  scimago_categories String?
+  scimago_match_key  String?
+  scimago_areas      String?
 
   journal JOURNAL_MAIN @relation(fields: [id], references: [id])
 }
 
 model SCOPUS_DB {
-  id                          Int     @id
-  scopus_match_key            String?
-  scopus_issn                 String?
-  scopus_eissn                String?
-  scopus_title                String?
-  active_status               String?
-  coverage_years              String?
-  discontinued                String?
-  source_type                 String?
-  top_level_life_sciences     String?
-  top_level_social_sciences   String?
-  top_level_physical_sciences String?
-  top_level_health_sciences   String?
-  asjc_1000_general           String?
-  asjc_1100_agricultural_and_biological_sciences String?
-  asjc_1200_arts_and_humanities String?
-  asjc_1300_biochemistry_genetics_molecular_biology String?
-  asjc_1400_business_management_accounting String?
-  asjc_1500_chemical_engineering String?
-  asjc_1600_chemistry          String?
-  asjc_1700_computer_science   String?
-  asjc_1800_decision_sciences  String?
-  asjc_1900_earth_and_planetary_sciences String?
-  asjc_2000_economics_econometrics_finance String?
-  asjc_2100_energy             String?
-  asjc_2200_engineering        String?
-  asjc_2300_environmental_science String?
-  asjc_2400_immunology_and_microbiology String?
-  asjc_2500_materials_science  String?
-  asjc_2600_mathematics        String?
-  asjc_2700_medicine           String?
-  asjc_2800_neuroscience       String?
-  asjc_2900_nursing            String?
-  asjc_3000_pharmacology_toxicology_pharmaceutics String?
-  asjc_3100_physics_and_astronomy String?
-  asjc_3200_psychology         String?
-  asjc_3300_social_sciences    String?
-  asjc_3400_veterinary         String?
-  asjc_3500_dentistry          String?
-  asjc_3600_health_professions String?
+  id               Int     @id
+  scopus_match_key String?
+  scopus_issn      String?
+  scopus_eissn     String?
+  scopus_title     String?
+  active_status    String?
+  coverage_years   String?
+  discontinued     String?
+  source_type      String?
 
   journal JOURNAL_MAIN @relation(fields: [id], references: [id])
 }
@@ -117,23 +89,23 @@ model NOTE_DB {
 }
 
 model journal_area {
-  id             Int      @id @default(autoincrement())
-  journal_title  String
-  issn_print     String?
-  issn_online    String?
-  source         String
-  area           String?
-  rank           String?
-  active_status  String?
-  source_type    String?
-  best_rank      String?
-  area_group     String?
-  major_group    String
+  id            Int     @id @default(autoincrement())
+  journal_title String
+  issn_print    String?
+  issn_online   String?
+  source        String
+  area          String?
+  rank          String?
+  active_status String?
+  source_type   String?
+  best_rank     String?
+  area_group    String?
+  major_group   String
 }
 
 model AREA {
-  area_id   Int     @id @default(autoincrement())
-  area_name String  @unique
+  area_id   Int    @id @default(autoincrement())
+  area_name String @unique
 
   journalAreaDetails JOURNAL_AREA_DETAIL[]
 }
@@ -149,35 +121,86 @@ model JOURNAL_AREA_DETAIL {
 }
 
 model AREA_GROUP {
-  area_group_id   Int     @id @default(autoincrement())
-  area_group_name String  @unique
+  area_group_id   Int    @id @default(autoincrement())
+  area_group_name String @unique
 
   journalAreaGroupDetails JOURNAL_AREA_GROUP_DETAIL[]
 }
 
 model JOURNAL_AREA_GROUP_DETAIL {
-  journal_id      Int
-  area_group_id   Int
+  journal_id    Int
+  area_group_id Int
 
-  journal     JOURNAL_MAIN @relation(fields: [journal_id], references: [id])
-  areaGroup   AREA_GROUP   @relation(fields: [area_group_id], references: [area_group_id])
+  journal   JOURNAL_MAIN @relation(fields: [journal_id], references: [id])
+  areaGroup AREA_GROUP   @relation(fields: [area_group_id], references: [area_group_id])
 
   @@id([journal_id, area_group_id])
 }
 
 model MAJOR_GROUP {
-  major_group_id   Int     @id @default(autoincrement())
-  major_group_name String  @unique
+  major_group_id   Int    @id @default(autoincrement())
+  major_group_name String @unique
 
   journalMajorGroupDetails JOURNAL_MAJOR_GROUP_DETAIL[]
 }
 
 model JOURNAL_MAJOR_GROUP_DETAIL {
-  journal_id      Int
-  major_group_id  Int
+  journal_id     Int
+  major_group_id Int
 
-  journal     JOURNAL_MAIN @relation(fields: [journal_id], references: [id])
-  majorGroup  MAJOR_GROUP  @relation(fields: [major_group_id], references: [major_group_id])
+  journal    JOURNAL_MAIN @relation(fields: [journal_id], references: [id])
+  majorGroup MAJOR_GROUP  @relation(fields: [major_group_id], references: [major_group_id])
 
   @@id([journal_id, major_group_id])
+}
+
+model SCOPUS_AREA {
+  scopus_area_id   Int    @id @default(autoincrement())
+  scopus_area_name String @unique
+
+  journalScopusAreaDetails JOURNAL_SCOPUS_AREA_DETAIL[]
+}
+
+model JOURNAL_SCOPUS_AREA_DETAIL {
+  journal_id     Int
+  scopus_area_id Int
+
+  journal    JOURNAL_MAIN @relation(fields: [journal_id], references: [id])
+  scopusArea SCOPUS_AREA  @relation(fields: [scopus_area_id], references: [scopus_area_id])
+
+  @@id([journal_id, scopus_area_id])
+}
+
+model SCOPUS_AREA_GROUP {
+  scopus_area_group_id   Int    @id @default(autoincrement())
+  scopus_area_group_name String @unique
+
+  journalScopusAreaGroupDetails JOURNAL_SCOPUS_AREA_GROUP_DETAIL[]
+}
+
+model JOURNAL_SCOPUS_AREA_GROUP_DETAIL {
+  journal_id           Int
+  scopus_area_group_id Int
+
+  journal         JOURNAL_MAIN      @relation(fields: [journal_id], references: [id])
+  scopusAreaGroup SCOPUS_AREA_GROUP @relation(fields: [scopus_area_group_id], references: [scopus_area_group_id])
+
+  @@id([journal_id, scopus_area_group_id])
+}
+
+model SCOPUS_MAJOR_GROUP {
+  scopus_major_group_id   Int    @id @default(autoincrement())
+  scopus_major_group_name String @unique
+
+  journalScopusMajorGroupDetails JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL[]
+}
+
+model JOURNAL_SCOPUS_MAJOR_GROUP_DETAIL {
+  journal_id            Int
+  scopus_major_group_id Int
+
+  journal          JOURNAL_MAIN       @relation(fields: [journal_id], references: [id])
+  scopusMajorGroup SCOPUS_MAJOR_GROUP @relation(fields: [scopus_major_group_id], references: [scopus_major_group_id])
+
+  @@id([journal_id, scopus_major_group_id])
 }
