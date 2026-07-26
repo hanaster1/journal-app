@@ -502,36 +502,36 @@ function RankTierReference() {
                   <TableCell>
                     <Badge variant="outline" className={TIER_COLORS[2]}>2</Badge>
                   </TableCell>
-                  <TableCell><Badge variant="outline" className={TIER_COLORS[1]}>A*</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={TIER_COLORS[2]}>A*</Badge></TableCell>
                   <TableCell><Badge variant="outline" className={TIER_COLORS[2]}>4</Badge></TableCell>
-                  <TableCell><Badge variant="outline" className={TIER_COLORS[1]}>Q1</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={TIER_COLORS[2]}>Q1</Badge></TableCell>
                   <TableCell className="text-muted-foreground">Excellent</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
                     <Badge variant="outline" className={TIER_COLORS[3]}>3</Badge>
                   </TableCell>
-                  <TableCell><Badge variant="outline" className={TIER_COLORS[2]}>A</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={TIER_COLORS[3]}>A</Badge></TableCell>
                   <TableCell><Badge variant="outline" className={TIER_COLORS[3]}>3</Badge></TableCell>
-                  <TableCell><Badge variant="outline" className={TIER_COLORS[2]}>Q2</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={TIER_COLORS[3]}>Q2</Badge></TableCell>
                   <TableCell className="text-muted-foreground">Very Good</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
                     <Badge variant="outline" className={TIER_COLORS[4]}>4</Badge>
                   </TableCell>
-                  <TableCell><Badge variant="outline" className={TIER_COLORS[3]}>B</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={TIER_COLORS[4]}>B</Badge></TableCell>
                   <TableCell><Badge variant="outline" className={TIER_COLORS[4]}>2</Badge></TableCell>
-                  <TableCell><Badge variant="outline" className={TIER_COLORS[3]}>Q3</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={TIER_COLORS[4]}>Q3</Badge></TableCell>
                   <TableCell className="text-muted-foreground">Good</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
                     <Badge variant="outline" className={TIER_COLORS[5]}>5</Badge>
                   </TableCell>
-                  <TableCell><Badge variant="outline" className={TIER_COLORS[4]}>C</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={TIER_COLORS[5]}>C</Badge></TableCell>
                   <TableCell><Badge variant="outline" className={TIER_COLORS[5]}>1</Badge></TableCell>
-                  <TableCell><Badge variant="outline" className={TIER_COLORS[4]}>Q4</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={TIER_COLORS[5]}>Q4</Badge></TableCell>
                   <TableCell className="text-muted-foreground">Standard</TableCell>
                 </TableRow>
               </TableBody>
