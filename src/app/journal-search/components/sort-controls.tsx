@@ -37,7 +37,7 @@ export function SortControls({ sort, order, onSortChange }: SortControlsProps) {
     <div className="flex items-center gap-2">
       <Label className="text-sm font-medium whitespace-nowrap">Sort by:</Label>
       <Combobox value={currentValue} onValueChange={handleChange}>
-        <ComboboxInput placeholder="Sort by..." className="w-[200px]" />
+        <ComboboxInput placeholder="Sort by..." className="w-[200px] bg-card" />
         <ComboboxContent>
           <ComboboxList>
             {SORT_OPTIONS.map((option) => (

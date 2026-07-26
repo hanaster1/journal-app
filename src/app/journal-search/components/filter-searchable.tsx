@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Combobox,
   ComboboxInput,
@@ -10,6 +10,8 @@ import {
   ComboboxEmpty,
 } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
+
+type IdComboboxOption = { value: string; label: string };
 
 interface FilterSearchableProps {
   label: string;
@@ -88,12 +90,19 @@ export function FilterSearchableId({
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  const getNameById = (id: string) =>
-    options.find((o) => o.id.toString() === id)?.name ?? "";
+  const items = useMemo<IdComboboxOption[]>(
+    () => options.map((option) => ({ value: option.id.toString(), label: option.name })),
+    [options]
+  );
 
-  const displayValue = isEditing ? inputValue : getNameById(value);
-  const filteredOptions = options.filter((option) =>
-    option.name.toLowerCase().includes(displayValue.toLowerCase())
+  const selectedItem = useMemo(
+    () => items.find((item) => item.value === value) ?? null,
+    [items, value]
+  );
+
+  const filterText = isEditing ? inputValue : (selectedItem?.label ?? "");
+  const filteredOptions = items.filter((option) =>
+    option.label.toLowerCase().includes(filterText.toLowerCase())
   );
 
   const handleInputValueChange = (newValue: string) => {
@@ -101,9 +110,8 @@ export function FilterSearchableId({
     setInputValue(newValue);
   };
 
-  const handleValueChange = (newValue: string | null) => {
-    const id = newValue ?? "";
-    onChange(id);
+  const handleValueChange = (newValue: IdComboboxOption | null) => {
+    onChange(newValue?.value ?? "");
     setIsEditing(false);
     setInputValue("");
   };
@@ -112,17 +120,18 @@ export function FilterSearchableId({
     <div className="space-y-2">
       <Label className="text-sm font-medium">{label}</Label>
       <Combobox
-        value={value}
+        value={selectedItem}
         onValueChange={handleValueChange}
-        inputValue={displayValue}
+        inputValue={filterText}
         onInputValueChange={handleInputValueChange}
+        isItemEqualToValue={(item, selected) => item.value === selected.value}
       >
         <ComboboxInput placeholder={placeholder} showClear />
         <ComboboxContent>
           <ComboboxList>
             {filteredOptions.map((option) => (
-              <ComboboxItem key={option.id} value={option.id.toString()}>
-                {option.name}
+              <ComboboxItem key={option.value} value={option}>
+                {option.label}
               </ComboboxItem>
             ))}
           </ComboboxList>

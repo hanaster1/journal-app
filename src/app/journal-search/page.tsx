@@ -72,6 +72,7 @@ function JournalSearchContent() {
           {hasActiveFilters && (
             <ActiveFilters
               filters={state.filters}
+              options={filterOptions}
               onFilterChange={setFilters}
               onClearAll={resetFilters}
             />

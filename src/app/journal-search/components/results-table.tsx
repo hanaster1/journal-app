@@ -20,10 +20,10 @@ export function ResultsTable({ journals }: ResultsTableProps) {
   const router = useRouter();
 
   return (
-    <div className="rounded-lg border">
+    <div className="rounded-lg border bg-card shadow-sm">
       <Table>
-        <TableHeader>
-          <TableRow>
+        <TableHeader className="sticky top-0 z-10 bg-secondary">
+          <TableRow className="border-b border-border hover:bg-secondary [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-foreground">
             <TableHead className="w-[300px]">Journal Title</TableHead>
             <TableHead>Publisher</TableHead>
             <TableHead>Area</TableHead>

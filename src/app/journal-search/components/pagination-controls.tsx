@@ -71,7 +71,7 @@ export function PaginationControls({
       <div className="flex items-center gap-2">
         <Label className="text-sm text-muted-foreground">Show:</Label>
         <Select value={limit.toString()} onValueChange={(v) => onLimitChange(Number(v))}>
-          <SelectTrigger className="w-[70px]">
+          <SelectTrigger className="w-[70px] bg-card">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -93,7 +93,11 @@ export function PaginationControls({
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => onPageChange(currentPage - 1)}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={
+                  currentPage === 1
+                    ? "pointer-events-none !bg-card opacity-50"
+                    : "cursor-pointer !bg-card hover:!bg-muted/50"
+                }
               />
             </PaginationItem>
 
@@ -107,7 +111,7 @@ export function PaginationControls({
                   <PaginationLink
                     isActive={page === currentPage}
                     onClick={() => onPageChange(page)}
-                    className="cursor-pointer"
+                    className="cursor-pointer !bg-card hover:!bg-muted/50"
                   >
                     {page}
                   </PaginationLink>
@@ -119,7 +123,9 @@ export function PaginationControls({
               <PaginationNext
                 onClick={() => onPageChange(currentPage + 1)}
                 className={
-                  currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"
+                  currentPage === totalPages
+                    ? "pointer-events-none !bg-card opacity-50"
+                    : "cursor-pointer !bg-card hover:!bg-muted/50"
                 }
               />
             </PaginationItem>

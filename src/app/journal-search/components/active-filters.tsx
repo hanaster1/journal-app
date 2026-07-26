@@ -4,15 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { SearchFilters } from "../hooks/use-search-state";
+import type { FilterOptions } from "../hooks/use-filter-options";
 
 interface ActiveFiltersProps {
   filters: SearchFilters;
+  options?: FilterOptions;
   onFilterChange: (filters: Partial<SearchFilters>) => void;
   onClearAll: () => void;
 }
 
+function getIdOptionName(
+  options: { id: number; name: string }[],
+  id: string
+): string {
+  return options.find((option) => option.id.toString() === id)?.name ?? id;
+}
+
 export function ActiveFilters({
   filters,
+  options,
   onFilterChange,
   onClearAll,
 }: ActiveFiltersProps) {
@@ -71,7 +81,7 @@ export function ActiveFilters({
   if (filters.area) {
     activeFilters.push({
       key: "area",
-      label: `Area: ${filters.area}`,
+      label: `ABDC Area: ${filters.area}`,
       onRemove: () => onFilterChange({ area: "" }),
     });
   }
@@ -95,7 +105,11 @@ export function ActiveFilters({
   if (filters.majorGroupId) {
     activeFilters.push({
       key: "major-group",
-      label: `Major Group: ${filters.majorGroupId}`,
+      label: `Major Group: ${
+        options
+          ? getIdOptionName(options.majorGroups, filters.majorGroupId)
+          : filters.majorGroupId
+      }`,
       onRemove: () => onFilterChange({ majorGroupId: "" }),
     });
   }
@@ -103,8 +117,36 @@ export function ActiveFilters({
   if (filters.areaGroupId) {
     activeFilters.push({
       key: "area-group",
-      label: `Area Group: ${filters.areaGroupId}`,
+      label: `Area Group: ${
+        options
+          ? getIdOptionName(options.areaGroups, filters.areaGroupId)
+          : filters.areaGroupId
+      }`,
       onRemove: () => onFilterChange({ areaGroupId: "" }),
+    });
+  }
+
+  if (filters.scopusAreaId) {
+    activeFilters.push({
+      key: "scopus-area",
+      label: `Scopus Area: ${
+        options
+          ? getIdOptionName(options.scopusAreas, filters.scopusAreaId)
+          : filters.scopusAreaId
+      }`,
+      onRemove: () => onFilterChange({ scopusAreaId: "" }),
+    });
+  }
+
+  if (filters.scopusAreaGroupId) {
+    activeFilters.push({
+      key: "scopus-area-group",
+      label: `Scopus Area Group: ${
+        options
+          ? getIdOptionName(options.scopusAreaGroups, filters.scopusAreaGroupId)
+          : filters.scopusAreaGroupId
+      }`,
+      onRemove: () => onFilterChange({ scopusAreaGroupId: "" }),
     });
   }
 
@@ -121,14 +163,44 @@ export function ActiveFilters({
     });
   }
 
+  if (filters.sourceTypes.length > 0) {
+    filters.sourceTypes.forEach((sourceType) => {
+      activeFilters.push({
+        key: `source-type-${sourceType}`,
+        label: `Source Type: ${sourceType}`,
+        onRemove: () =>
+          onFilterChange({
+            sourceTypes: filters.sourceTypes.filter((type) => type !== sourceType),
+          }),
+      });
+    });
+  }
+
+  if (filters.yearFrom || filters.yearTo) {
+    const from = filters.yearFrom || "…";
+    const to = filters.yearTo || "…";
+    activeFilters.push({
+      key: "year-range",
+      label: `Year: ${from}–${to}`,
+      onRemove: () => onFilterChange({ yearFrom: "", yearTo: "" }),
+    });
+  }
+
   if (activeFilters.length === 0) return null;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       {activeFilters.map((filter) => (
-        <Badge key={filter.key} variant="secondary" className="gap-1">
+        <Badge key={filter.key} variant="secondary" className="gap-1 pr-1">
           {filter.label}
-          <X className="h-3 w-3 cursor-pointer" onClick={filter.onRemove} />
+          <button
+            type="button"
+            aria-label={`Remove ${filter.label}`}
+            onClick={filter.onRemove}
+            className="rounded-sm p-0.5 hover:bg-secondary-foreground/10"
+          >
+            <X className="h-3 w-3" />
+          </button>
         </Badge>
       ))}
       <Button variant="ghost" size="sm" onClick={onClearAll} className="h-6 px-2 text-xs">

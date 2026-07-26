@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
@@ -12,17 +13,23 @@ interface FilterSectionProps {
   title: string;
   count?: number;
   children: React.ReactNode;
-  defaultValue?: boolean;
+  open?: boolean;
 }
 
 export function FilterSection({
   title,
   count = 0,
   children,
-  defaultValue = false,
+  open = false,
 }: FilterSectionProps) {
+  const [value, setValue] = useState<string[]>(() => (open ? ["item"] : []));
+
+  useEffect(() => {
+    setValue(open ? ["item"] : []);
+  }, [open]);
+
   return (
-    <Accordion defaultValue={defaultValue ? ["item"] : undefined}>
+    <Accordion value={value} onValueChange={setValue}>
       <AccordionItem value="item" className="border-b">
         <AccordionTrigger className="hover:no-underline">
           <div className="flex items-center gap-2">

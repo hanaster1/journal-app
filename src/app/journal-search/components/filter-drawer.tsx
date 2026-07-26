@@ -33,7 +33,7 @@ export function FilterDrawer({
     <Sheet>
       <SheetTrigger
         render={
-          <Button variant="outline" className="relative">
+          <Button variant="outline" className="relative !bg-card hover:!bg-muted/50">
             <Filter className="mr-2 h-4 w-4" />
             Filters
             {activeFilterCount > 0 && (

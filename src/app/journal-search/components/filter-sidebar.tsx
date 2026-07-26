@@ -48,7 +48,7 @@ export function FilterSidebar({
             <FilterSection
               title="Database Source"
               count={filters.sources.length}
-              defaultValue={filters.sources.length > 0}
+              open={filters.sources.length > 0}
             >
               <FilterCheckboxGroup
                 label=""
@@ -61,7 +61,7 @@ export function FilterSidebar({
             <FilterSection
               title="Publisher"
               count={filters.publisher ? 1 : 0}
-              defaultValue={!!filters.publisher}
+              open={!!filters.publisher}
             >
               <FilterSearchable
                 label=""
@@ -75,7 +75,7 @@ export function FilterSidebar({
             <FilterSection
               title="Active Status"
               count={filters.activeStatuses.length}
-              defaultValue={filters.activeStatuses.length > 0}
+              open={filters.activeStatuses.length > 0}
             >
               <FilterCheckboxGroup
                 label=""
@@ -90,7 +90,7 @@ export function FilterSidebar({
             <FilterSection
               title="Source Type"
               count={filters.sourceTypes.length}
-              defaultValue={filters.sourceTypes.length > 0}
+              open={filters.sourceTypes.length > 0}
             >
               <FilterCheckboxGroup
                 label=""
@@ -103,7 +103,7 @@ export function FilterSidebar({
             <FilterSection
               title="Year Inception"
               count={filters.yearFrom || filters.yearTo ? 1 : 0}
-              defaultValue={!!(filters.yearFrom || filters.yearTo)}
+              open={!!(filters.yearFrom || filters.yearTo)}
             >
               <FilterYearRange
                 min={options.yearRange.min ?? 1800}
@@ -119,7 +119,7 @@ export function FilterSidebar({
             <FilterSection
               title="ABDC Rating"
               count={filters.abdcRatings.length}
-              defaultValue={filters.abdcRatings.length > 0}
+              open={filters.abdcRatings.length > 0}
             >
               <FilterCheckboxGroup
                 label=""
@@ -132,7 +132,7 @@ export function FilterSidebar({
             <FilterSection
               title="AJG Rating"
               count={filters.ajgRatings.length}
-              defaultValue={filters.ajgRatings.length > 0}
+              open={filters.ajgRatings.length > 0}
             >
               <FilterCheckboxGroup
                 label=""
@@ -145,7 +145,7 @@ export function FilterSidebar({
             <FilterSection
               title="SJR Quartile"
               count={filters.sjrQuartiles.length}
-              defaultValue={filters.sjrQuartiles.length > 0}
+              open={filters.sjrQuartiles.length > 0}
             >
               <FilterCheckboxGroup
                 label=""
@@ -160,7 +160,7 @@ export function FilterSidebar({
             <FilterSection
               title="ABDC Area"
               count={filters.area ? 1 : 0}
-              defaultValue={!!filters.area}
+              open={!!filters.area}
             >
               <FilterSearchable
                 label=""
@@ -174,7 +174,7 @@ export function FilterSidebar({
             <FilterSection
               title="AJG Subject Area"
               count={filters.ajgSubjectArea ? 1 : 0}
-              defaultValue={!!filters.ajgSubjectArea}
+              open={!!filters.ajgSubjectArea}
             >
               <FilterSearchable
                 label=""
@@ -188,7 +188,7 @@ export function FilterSidebar({
             <FilterSection
               title="Major Group"
               count={filters.majorGroupId ? 1 : 0}
-              defaultValue={!!filters.majorGroupId}
+              open={!!filters.majorGroupId}
             >
               <FilterSearchableId
                 label=""
@@ -202,7 +202,7 @@ export function FilterSidebar({
             <FilterSection
               title="Area Group"
               count={filters.areaGroupId ? 1 : 0}
-              defaultValue={!!filters.areaGroupId}
+              open={!!filters.areaGroupId}
             >
               <FilterSearchableId
                 label=""
@@ -216,7 +216,7 @@ export function FilterSidebar({
             <FilterSection
               title="Scopus Area"
               count={filters.scopusAreaId ? 1 : 0}
-              defaultValue={!!filters.scopusAreaId}
+              open={!!filters.scopusAreaId}
             >
               <FilterSearchableId
                 label=""
@@ -230,7 +230,7 @@ export function FilterSidebar({
             <FilterSection
               title="Scopus Area Group"
               count={filters.scopusAreaGroupId ? 1 : 0}
-              defaultValue={!!filters.scopusAreaGroupId}
+              open={!!filters.scopusAreaGroupId}
             >
               <FilterSearchableId
                 label=""
