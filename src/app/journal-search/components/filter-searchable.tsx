@@ -26,20 +26,33 @@ export function FilterSearchable({
   onChange,
   placeholder = "Select...",
 }: FilterSearchableProps) {
-  const [inputValue, setInputValue] = useState(value);
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
+  const displayValue = isEditing ? inputValue : value;
   const filteredOptions = options.filter((option) =>
-    option.toLowerCase().includes(inputValue.toLowerCase())
+    option.toLowerCase().includes((isEditing ? inputValue : value).toLowerCase())
   );
+
+  const handleInputValueChange = (newValue: string) => {
+    setIsEditing(true);
+    setInputValue(newValue);
+  };
+
+  const handleValueChange = (newValue: string | null) => {
+    onChange(newValue ?? "");
+    setIsEditing(false);
+    setInputValue("");
+  };
 
   return (
     <div className="space-y-2">
       <Label className="text-sm font-medium">{label}</Label>
       <Combobox
         value={value}
-        onValueChange={(v) => onChange(v ?? "")}
-        inputValue={inputValue}
-        onInputValueChange={setInputValue}
+        onValueChange={handleValueChange}
+        inputValue={displayValue}
+        onInputValueChange={handleInputValueChange}
       >
         <ComboboxInput placeholder={placeholder} showClear />
         <ComboboxContent>
@@ -72,22 +85,37 @@ export function FilterSearchableId({
   onChange,
   placeholder = "Select...",
 }: FilterSearchableIdProps) {
-  const [inputValue, setInputValue] = useState(
-    options.find((o) => o.id.toString() === value)?.name ?? ""
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
+  const getNameById = (id: string) =>
+    options.find((o) => o.id.toString() === id)?.name ?? "";
+
+  const displayValue = isEditing ? inputValue : getNameById(value);
+  const filteredOptions = options.filter((option) =>
+    option.name.toLowerCase().includes(displayValue.toLowerCase())
   );
 
-  const filteredOptions = options.filter((option) =>
-    option.name.toLowerCase().includes(inputValue.toLowerCase())
-  );
+  const handleInputValueChange = (newValue: string) => {
+    setIsEditing(true);
+    setInputValue(newValue);
+  };
+
+  const handleValueChange = (newValue: string | null) => {
+    const id = newValue ?? "";
+    onChange(id);
+    setIsEditing(false);
+    setInputValue("");
+  };
 
   return (
     <div className="space-y-2">
       <Label className="text-sm font-medium">{label}</Label>
       <Combobox
         value={value}
-        onValueChange={(v) => onChange(v ?? "")}
-        inputValue={inputValue}
-        onInputValueChange={setInputValue}
+        onValueChange={handleValueChange}
+        inputValue={displayValue}
+        onInputValueChange={handleInputValueChange}
       >
         <ComboboxInput placeholder={placeholder} showClear />
         <ComboboxContent>

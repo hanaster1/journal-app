@@ -53,6 +53,7 @@ export function FilterDrawer({
           options={options}
           onFilterChange={onFilterChange}
           onReset={onReset}
+          activeFilterCount={activeFilterCount}
         />
       </SheetContent>
     </Sheet>

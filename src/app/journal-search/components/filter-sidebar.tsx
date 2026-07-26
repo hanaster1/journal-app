@@ -14,6 +14,20 @@ interface FilterSidebarProps {
   options: FilterOptions;
   onFilterChange: (filters: Partial<SearchFilters>) => void;
   onReset: () => void;
+  activeFilterCount: number;
+}
+
+function FilterCategory({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <div className="px-0 pt-3 pb-1">
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </span>
+      </div>
+      {children}
+    </div>
+  );
 }
 
 export function FilterSidebar({
@@ -21,6 +35,7 @@ export function FilterSidebar({
   options,
   onFilterChange,
   onReset,
+  activeFilterCount,
 }: FilterSidebarProps) {
   return (
     <Card className="flex h-full flex-col overflow-hidden">
@@ -29,190 +44,214 @@ export function FilterSidebar({
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto p-0">
         <div className="space-y-1 px-4">
-          <FilterSection
-            title="Database Source"
-            count={filters.sources.length}
-            defaultValue={true}
-          >
-            <FilterCheckboxGroup
-              label=""
-              options={options.sources}
-              selected={filters.sources}
-              onChange={(sources) => onFilterChange({ sources })}
-            />
-          </FilterSection>
+          <FilterCategory label="Metadata">
+            <FilterSection
+              title="Database Source"
+              count={filters.sources.length}
+              defaultValue={filters.sources.length > 0}
+            >
+              <FilterCheckboxGroup
+                label=""
+                options={options.sources}
+                selected={filters.sources}
+                onChange={(sources) => onFilterChange({ sources })}
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="ABDC Rating"
-            count={filters.abdcRatings.length}
-          >
-            <FilterCheckboxGroup
-              label=""
-              options={options.abdcRatings}
-              selected={filters.abdcRatings}
-              onChange={(abdcRatings) => onFilterChange({ abdcRatings })}
-            />
-          </FilterSection>
+            <FilterSection
+              title="Publisher"
+              count={filters.publisher ? 1 : 0}
+              defaultValue={!!filters.publisher}
+            >
+              <FilterSearchable
+                label=""
+                options={options.publishers}
+                value={filters.publisher}
+                onChange={(publisher) => onFilterChange({ publisher })}
+                placeholder="Select publisher..."
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="AJG Rating"
-            count={filters.ajgRatings.length}
-          >
-            <FilterCheckboxGroup
-              label=""
-              options={options.ajgRatings}
-              selected={filters.ajgRatings}
-              onChange={(ajgRatings) => onFilterChange({ ajgRatings })}
-            />
-          </FilterSection>
+            <FilterSection
+              title="Active Status"
+              count={filters.activeStatuses.length}
+              defaultValue={filters.activeStatuses.length > 0}
+            >
+              <FilterCheckboxGroup
+                label=""
+                options={options.activeStatuses}
+                selected={filters.activeStatuses}
+                onChange={(activeStatuses) =>
+                  onFilterChange({ activeStatuses })
+                }
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="SJR Quartile"
-            count={filters.sjrQuartiles.length}
-          >
-            <FilterCheckboxGroup
-              label=""
-              options={options.sjrQuartiles}
-              selected={filters.sjrQuartiles}
-              onChange={(sjrQuartiles) => onFilterChange({ sjrQuartiles })}
-            />
-          </FilterSection>
+            <FilterSection
+              title="Source Type"
+              count={filters.sourceTypes.length}
+              defaultValue={filters.sourceTypes.length > 0}
+            >
+              <FilterCheckboxGroup
+                label=""
+                options={options.sourceTypes}
+                selected={filters.sourceTypes}
+                onChange={(sourceTypes) => onFilterChange({ sourceTypes })}
+              />
+            </FilterSection>
 
-          <FilterSection title="ABDC Area" count={filters.area ? 1 : 0}>
-            <FilterSearchable
-              label=""
-              options={options.areas}
-              value={filters.area}
-              onChange={(area) => onFilterChange({ area })}
-              placeholder="Select area..."
-            />
-          </FilterSection>
+            <FilterSection
+              title="Year Inception"
+              count={filters.yearFrom || filters.yearTo ? 1 : 0}
+              defaultValue={!!(filters.yearFrom || filters.yearTo)}
+            >
+              <FilterYearRange
+                min={options.yearRange.min ?? 1800}
+                max={options.yearRange.max ?? 2025}
+                yearFrom={filters.yearFrom}
+                yearTo={filters.yearTo}
+                onChange={(yearFrom, yearTo) => onFilterChange({ yearFrom, yearTo })}
+              />
+            </FilterSection>
+          </FilterCategory>
 
-          <FilterSection
-            title="AJG Subject Area"
-            count={filters.ajgSubjectArea ? 1 : 0}
-          >
-            <FilterSearchable
-              label=""
-              options={options.ajgSubjectAreas}
-              value={filters.ajgSubjectArea}
-              onChange={(ajgSubjectArea) => onFilterChange({ ajgSubjectArea })}
-              placeholder="Select subject area..."
-            />
-          </FilterSection>
+          <FilterCategory label="Ratings">
+            <FilterSection
+              title="ABDC Rating"
+              count={filters.abdcRatings.length}
+              defaultValue={filters.abdcRatings.length > 0}
+            >
+              <FilterCheckboxGroup
+                label=""
+                options={options.abdcRatings}
+                selected={filters.abdcRatings}
+                onChange={(abdcRatings) => onFilterChange({ abdcRatings })}
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="Major Group"
-            count={filters.majorGroupId ? 1 : 0}
-          >
-            <FilterSearchableId
-              label=""
-              options={options.majorGroups}
-              value={filters.majorGroupId}
-              onChange={(majorGroupId) => onFilterChange({ majorGroupId })}
-              placeholder="Select major group..."
-            />
-          </FilterSection>
+            <FilterSection
+              title="AJG Rating"
+              count={filters.ajgRatings.length}
+              defaultValue={filters.ajgRatings.length > 0}
+            >
+              <FilterCheckboxGroup
+                label=""
+                options={options.ajgRatings}
+                selected={filters.ajgRatings}
+                onChange={(ajgRatings) => onFilterChange({ ajgRatings })}
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="Area Group"
-            count={filters.areaGroupId ? 1 : 0}
-          >
-            <FilterSearchableId
-              label=""
-              options={options.areaGroups}
-              value={filters.areaGroupId}
-              onChange={(areaGroupId) => onFilterChange({ areaGroupId })}
-              placeholder="Select area group..."
-            />
-          </FilterSection>
+            <FilterSection
+              title="SJR Quartile"
+              count={filters.sjrQuartiles.length}
+              defaultValue={filters.sjrQuartiles.length > 0}
+            >
+              <FilterCheckboxGroup
+                label=""
+                options={options.sjrQuartiles}
+                selected={filters.sjrQuartiles}
+                onChange={(sjrQuartiles) => onFilterChange({ sjrQuartiles })}
+              />
+            </FilterSection>
+          </FilterCategory>
 
-          <FilterSection
-            title="Scopus Area"
-            count={filters.scopusAreaId ? 1 : 0}
-          >
-            <FilterSearchableId
-              label=""
-              options={options.scopusAreas}
-              value={filters.scopusAreaId}
-              onChange={(scopusAreaId) => onFilterChange({ scopusAreaId })}
-              placeholder="Select Scopus area..."
-            />
-          </FilterSection>
+          <FilterCategory label="Subject Areas">
+            <FilterSection
+              title="ABDC Area"
+              count={filters.area ? 1 : 0}
+              defaultValue={!!filters.area}
+            >
+              <FilterSearchable
+                label=""
+                options={options.areas}
+                value={filters.area}
+                onChange={(area) => onFilterChange({ area })}
+                placeholder="Select area..."
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="Scopus Area Group"
-            count={filters.scopusAreaGroupId ? 1 : 0}
-          >
-            <FilterSearchableId
-              label=""
-              options={options.scopusAreaGroups}
-              value={filters.scopusAreaGroupId}
-              onChange={(scopusAreaGroupId) =>
-                onFilterChange({ scopusAreaGroupId })
-              }
-              placeholder="Select Scopus area group..."
-            />
-          </FilterSection>
+            <FilterSection
+              title="AJG Subject Area"
+              count={filters.ajgSubjectArea ? 1 : 0}
+              defaultValue={!!filters.ajgSubjectArea}
+            >
+              <FilterSearchable
+                label=""
+                options={options.ajgSubjectAreas}
+                value={filters.ajgSubjectArea}
+                onChange={(ajgSubjectArea) => onFilterChange({ ajgSubjectArea })}
+                placeholder="Select subject area..."
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="Publisher"
-            count={filters.publisher ? 1 : 0}
-          >
-            <FilterSearchable
-              label=""
-              options={options.publishers}
-              value={filters.publisher}
-              onChange={(publisher) => onFilterChange({ publisher })}
-              placeholder="Select publisher..."
-            />
-          </FilterSection>
+            <FilterSection
+              title="Major Group"
+              count={filters.majorGroupId ? 1 : 0}
+              defaultValue={!!filters.majorGroupId}
+            >
+              <FilterSearchableId
+                label=""
+                options={options.majorGroups}
+                value={filters.majorGroupId}
+                onChange={(majorGroupId) => onFilterChange({ majorGroupId })}
+                placeholder="Select major group..."
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="Active Status"
-            count={filters.activeStatuses.length}
-          >
-            <FilterCheckboxGroup
-              label=""
-              options={options.activeStatuses}
-              selected={filters.activeStatuses}
-              onChange={(activeStatuses) =>
-                onFilterChange({ activeStatuses })
-              }
-            />
-          </FilterSection>
+            <FilterSection
+              title="Area Group"
+              count={filters.areaGroupId ? 1 : 0}
+              defaultValue={!!filters.areaGroupId}
+            >
+              <FilterSearchableId
+                label=""
+                options={options.areaGroups}
+                value={filters.areaGroupId}
+                onChange={(areaGroupId) => onFilterChange({ areaGroupId })}
+                placeholder="Select area group..."
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="Source Type"
-            count={filters.sourceTypes.length}
-          >
-            <FilterCheckboxGroup
-              label=""
-              options={options.sourceTypes}
-              selected={filters.sourceTypes}
-              onChange={(sourceTypes) => onFilterChange({ sourceTypes })}
-            />
-          </FilterSection>
+            <FilterSection
+              title="Scopus Area"
+              count={filters.scopusAreaId ? 1 : 0}
+              defaultValue={!!filters.scopusAreaId}
+            >
+              <FilterSearchableId
+                label=""
+                options={options.scopusAreas}
+                value={filters.scopusAreaId}
+                onChange={(scopusAreaId) => onFilterChange({ scopusAreaId })}
+                placeholder="Select Scopus area..."
+              />
+            </FilterSection>
 
-          <FilterSection
-            title="Year Inception"
-            count={filters.yearFrom || filters.yearTo ? 1 : 0}
-          >
-            <FilterYearRange
-              min={options.yearRange.min ?? 1800}
-              max={options.yearRange.max ?? 2025}
-              yearFrom={filters.yearFrom}
-              yearTo={filters.yearTo}
-              onChange={(yearFrom, yearTo) => onFilterChange({ yearFrom, yearTo })}
-            />
-          </FilterSection>
+            <FilterSection
+              title="Scopus Area Group"
+              count={filters.scopusAreaGroupId ? 1 : 0}
+              defaultValue={!!filters.scopusAreaGroupId}
+            >
+              <FilterSearchableId
+                label=""
+                options={options.scopusAreaGroups}
+                value={filters.scopusAreaGroupId}
+                onChange={(scopusAreaGroupId) =>
+                  onFilterChange({ scopusAreaGroupId })
+                }
+                placeholder="Select Scopus area group..."
+              />
+            </FilterSection>
+          </FilterCategory>
         </div>
       </CardContent>
-      <CardFooter className="shrink-0">
-        <Button variant="outline" onClick={onReset} className="w-full">
-          Reset Filters
-        </Button>
-      </CardFooter>
+      {activeFilterCount > 0 && (
+        <CardFooter className="shrink-0">
+          <Button variant="outline" onClick={onReset} className="w-full">
+            Reset Filters
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }
