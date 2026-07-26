@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, LayoutDashboard, Menu, Search } from "lucide-react";
+import { BookOpen, LayoutDashboard, Menu, Search, BarChart3 } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -15,6 +15,7 @@ const links = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
   { href: "/area-explorer", label: "Explore", icon: BookOpen },
   { href: "/journal-search", label: "Search", icon: Search },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
 export function Nav() {

@@ -152,9 +152,10 @@ erDiagram
         int journal_id "PK FK"
         int scopus_major_group_id "PK FK"
     }
-    ```
+```
 
-## Relationships
+
+# Relationships
 
 | Parent | Child | Type | Description |
 |--------|-------|------|-------------|
